@@ -1,0 +1,2 @@
+defmodule JaResource do
+end
