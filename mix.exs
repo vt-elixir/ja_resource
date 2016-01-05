@@ -7,6 +7,8 @@ defmodule JaResource.Mixfile do
      elixir: "~> 1.1",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     package: package,
+     description: description,
      deps: deps]
   end
 
@@ -28,5 +30,23 @@ defmodule JaResource.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     []
+  end
+
+  defp package do
+    [
+      licenses: ["Apache 2.0"],
+      maintainers: ["Alan Peabody"],
+      links: %{
+        "GitHub" => "https://github.com/AgilionApps/ja_resource"
+      },
+    ]
+  end
+
+  defp description do
+    """
+    A behaviour for defining JSON-API spec controllers in Phoenix.
+
+    Lets you focus on your data, not on boilerplate controller code.
+    """
   end
 end

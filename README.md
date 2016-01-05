@@ -1,6 +1,12 @@
 # JaResource
 
-**TODO: Add description**
+A behaviour for defining JSON-API spec controllers in Phoenix.
+
+Lets you focus on your data, not on boilerplate controller code. Provides
+complete ability to customize everything, while removing the boilerplate.
+
+
+** DISCLAIMER: This is curretly pre-release software **
 
 ## Installation
 
