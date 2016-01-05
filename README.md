@@ -1,10 +1,12 @@
 # JaResource
 
-A behaviour for defining JSON-API spec controllers in Phoenix.
+A behaviour to reduce boilerplate in your JSON-API compliant Phoenix 
+controllers with out sacrificing flexibility.
 
-Lets you focus on your data, not on boilerplate controller code. Provides
-complete ability to customize everything, while removing the boilerplate.
+## Rational
 
+JaResource lets you focus on the data in your APIs, instead of worrying about 
+response status, rendering validation errors, and inserting changesets.
 
 ** DISCLAIMER: This is curretly pre-release software **
 
