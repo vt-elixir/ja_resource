@@ -18,7 +18,9 @@ defmodule JaResource.Create do
         |> JaResource.Create.respond(conn)
       end
 
-      def handle_create(conn, params), do: records(conn)
+      def handle_create(_conn, attributes) do 
+        __MODULE__.model.changeset(__MODULE__.model.__struct__, attributes)
+      end
 
       defoverridable [create: 2, handle_create: 2]
     end

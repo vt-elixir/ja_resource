@@ -22,6 +22,9 @@ defmodule JaResource.Update do
       end
 
       def handle_update(conn, nil, _params), do: nil
+      def handle_update(_conn, model, attributes) do
+        __MODULE__.model.changeset(model, attributes)
+      end
 
       defoverridable [update: 2, handle_update: 3]
     end
