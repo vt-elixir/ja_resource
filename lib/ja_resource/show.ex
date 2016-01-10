@@ -7,13 +7,13 @@ defmodule JaResource.Show do
   defmacro __using__(_) do
     quote do
       use JaResource.Record
+      use JaResource.Serializable
       @behaviour JaResource.Show
 
       def show(conn, %{"id" => id}) do
-        #todo, attribute normalization
         conn
         |> handle_show(id)
-        |> JaResource.Show.respond(conn)
+        |> JaResource.Show.respond(conn, __MODULE__)
       end
 
       def handle_show(conn, id), do: record(conn, id)
@@ -23,7 +23,10 @@ defmodule JaResource.Show do
   end
 
   @doc false
-  def respond(%Plug.Conn{} = conn, _old_conn), do: conn
-  def respond(nil, conn), do: send_resp(conn, :not_found, nil)
-  def respond(model, conn), do: Phoenix.Controller.render(conn, :show, data: model)
+  def respond(%Plug.Conn{} = conn, _old_conn, _controller), do: conn
+  def respond(nil, conn, _controller), do: send_resp(conn, :not_found, nil)
+  def respond(model, conn, controller) do
+    opts = controller.serialization_opts(conn, conn.query_params)
+    Phoenix.Controller.render(conn, :show, data: model, opts: opts)
+  end
 end
