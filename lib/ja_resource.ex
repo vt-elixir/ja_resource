@@ -8,6 +8,7 @@ defmodule JaResource do
 
   defmacro __using__(opts) do
     quote do
+      use JaResource.Model
       unquote(JaResource.use_action_behaviours(opts))
     end
   end
@@ -44,6 +45,7 @@ defmodule JaResource do
   end
 end
 
+
 defmodule JaResource.Records do
   use Behaviour
 
@@ -52,6 +54,10 @@ defmodule JaResource.Records do
   defmacro __using__(_) do
     quote do
       @behaviour JaResource.Records
+      
+      def records(_conn), do: model()
+
+      defoverridable [records: 1]
     end
   end
 end

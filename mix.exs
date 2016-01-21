@@ -29,7 +29,10 @@ defmodule JaResource.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:ecto, ">= 1.0.0"},
+      {:plug, ">= 1.0.0"}
+    ]
   end
 
   defp package do
