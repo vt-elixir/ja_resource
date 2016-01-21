@@ -8,6 +8,7 @@ defmodule JaResource.Index do
   defmacro __using__(_) do
     quote do
       use JaResource.Records
+      use JaResource.Serializable
       @behaviour JaResource.Index
       @before_compile JaResource.Index
 
@@ -18,7 +19,7 @@ defmodule JaResource.Index do
         |> JaResource.Index.filter(conn, __MODULE__)
         |> JaResource.Index.sort(conn, __MODULE__)
         |> JaResource.Index.execute_query(__MODULE__)
-        |> JaResource.Index.respond(conn)
+        |> JaResource.Index.respond(conn, __MODULE__)
       end
 
       def handle_index(conn, params), do: records(conn)
@@ -49,7 +50,7 @@ defmodule JaResource.Index do
 
   @sort_regex ~r/(-?)(\S*)/
   @doc false
-  def sort(results, conn, resource) do
+  def sort(results, conn, controller) do
     case conn.params["sort"] do
       nil -> results
       fields ->
@@ -57,8 +58,8 @@ defmodule JaResource.Index do
         |> String.split(",")
         |> Enum.reduce(results, fn(field, acc) ->
           case Regex.run(@sort_regex, field) do
-            [_, "", field] -> resource.sort(field, acc, :asc)
-            [_, "-", field] -> resource.sort(field, acc, :desc)
+            [_, "", field]  -> controller.sort(field, acc, :asc)
+            [_, "-", field] -> controller.sort(field, acc, :desc)
           end
         end)
     end
@@ -71,8 +72,9 @@ defmodule JaResource.Index do
   def execute_query(results, _controller) when is_list(results), do: results
 
   @doc false
-  def respond(%Plug.Conn{} = conn, _oldconn), do: conn
-  def respond(models, conn) do
-    Phoenix.Controller.render(conn, :index, data: models)
+  def respond(%Plug.Conn{} = conn, _oldconn, _controller), do: conn
+  def respond(models, conn, controller) do
+    opts = controller.serialization_opts(conn, conn.query_params)
+    Phoenix.Controller.render(conn, :index, data: models, opts: opts)
   end
 end
