@@ -1,11 +1,11 @@
 # JaResource
 
-A behaviour to reduce boilerplate in your JSON-API compliant Phoenix 
+A behaviour to reduce boilerplate in your JSON-API compliant Phoenix
 controllers with out sacrificing flexibility.
 
 ## Rational
 
-JaResource lets you focus on the data in your APIs, instead of worrying about 
+JaResource lets you focus on the data in your APIs, instead of worrying about
 response status, rendering validation errors, and inserting changesets.
 
 ** DISCLAIMER: This is curretly pre-release software **
@@ -35,12 +35,12 @@ controllers:
 
 ## Usage
 
-For the most simplistic resources JaSerializer lets you replace hundreds of 
+For the most simplistic resources JaSerializer lets you replace hundreds of
 lines of boilerplate with a simple use statement. JaResource simply defines
 the standard restful controller actions for you, while providing many simple
 callbacks you can optionally implement to customize behaviour.
 
-To expose index, show, update, create, and delete of the `MyApp.Post` model 
+To expose index, show, update, create, and delete of the `MyApp.Post` model
 with no retrictions:
 
 ```elixir
@@ -50,7 +50,7 @@ defmodule MyApp.V1.PostController do
 end
 ```
 
-You can optional restrict JaResource to only implement the actions you don't 
+You can optional restrict JaResource to only implement the actions you don't
 want to define yourself (however there are better ways to tweak behavior):
 
 ```elixir
@@ -64,7 +64,7 @@ defmodule MyApp.V1.PostsController do
 end
 ```
 
-And because JaResource is just implementing actions, you can still use plug 
+And because JaResource is just implementing actions, you can still use plug
 filters just like in normal Phoenix controllers:
 
 ```elixir
@@ -107,3 +107,40 @@ defmodule MyApp.V1.PostsController do
 end
 ```
 
+### Customizing records returned
+
+Many applications need to expose only subsets of a resource to a given user,
+those they have access too or maybe just models that are not soft deleted.
+JaResource allows you to define the `records/1` and `record/2`
+
+`records/1` is used by index, show, update, and delete requests to get the base
+query of records. Many/most controllers will override this:
+
+```elixir
+defmodule MyApp.V1.MyPostController do
+  use MyApp.Web, :controller
+  use JaResource
+
+  def model, do: MyApp.Post
+  def records(%Plug.Conn{assigns: %{user_id: user_id}}) do
+    model
+    |> where([p], p.author_id == ^user_id)
+  end
+end
+```
+
+`record/2` receives the results of `records/1` and the id param and returns a
+single record for use in show, update, and delete. This is less common to
+customize but may be useful if using non-id fields in the url:
+
+```elixir
+defmodule MyApp.V1.PostController do
+  use MyApp.Web, :controller
+  use JaResource
+
+  def record(query, slug_as_id) do
+    query
+    |> MyApp.Repo.get_by(slug: slug_as_id)
+  end
+end
+```
