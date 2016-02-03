@@ -2,6 +2,8 @@ defmodule JaResource.Records do
   use Behaviour
 
   @moduledoc """
+  Provides the `records/1` callback used for filtering records to be served.
+
   This behaviour is used by the following JaResource actions:
     
     * JaResource.Index
@@ -9,7 +11,7 @@ defmodule JaResource.Records do
     * JaResource.Update
     * JaResource.Delete
 
-  It relies on:
+  It relies on (and uses):
 
     * JaResource.Model
 
@@ -25,11 +27,13 @@ defmodule JaResource.Records do
         |> where([p], p.author_id == ^user_id)
       end
 
+  Return value should be %Plug.Conn{} or an %Ecto.Query{}.
   """
   @callback records(Plug.Conn.t) :: Plug.Conn.t | JaResource.records
 
   defmacro __using__(_) do
     quote do
+      use JaResource.Model
       @behaviour JaResource.Records
       
       def records(_conn), do: model()

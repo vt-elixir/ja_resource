@@ -1,6 +1,12 @@
 defmodule JaResource.Model do
   use Behaviour
 
+  @moduledoc """
+  Provides the `model/0` callback used to customize the resource served.
+
+  This behaviour is used by all JaResource actions.
+  """
+
   @doc """
   Must return the module implementing `Ecto.Schema` to be represented.
 
@@ -10,7 +16,6 @@ defmodule JaResource.Model do
 
   Defaults to the name of the controller, for example the controller
   `MyApp.V1.PostController` would serve the `MyApp.Post` model.
-
 
   Used by the default implementations for `handle_create/2`, `handle_update/3`,
   and `records/1`.

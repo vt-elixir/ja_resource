@@ -24,7 +24,6 @@ defmodule JaResource do
 
   defmacro __using__(opts) do
     quote do
-      use JaResource.Model
       @behaviour JaResource
       unquote(JaResource.use_action_behaviours(opts))
       unquote(JaResource.default_repo)

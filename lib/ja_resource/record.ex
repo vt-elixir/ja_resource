@@ -8,7 +8,7 @@ defmodule JaResource.Record do
     * JaResource.Update
     * JaResource.Delete
 
-  It relies on:
+  It relies on (and uses):
 
     * JaResource.Records
 
