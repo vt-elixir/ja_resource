@@ -1,6 +1,5 @@
 defmodule JaResource.Attributes do
   use Behaviour
-  import Plug.Conn
 
   @callback permitted_attributes(Plug.Conn.t, JaResource.attributes, :update | :create) :: JaResourse.attributes
 
