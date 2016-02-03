@@ -1,7 +1,7 @@
 # JaResource
 
 A behaviour to reduce boilerplate in your JSON-API compliant Phoenix
-controllers with out sacrificing flexibility.
+controllers without sacrificing flexibility.
 
 ## Rational
 
@@ -12,21 +12,21 @@ response status, rendering validation errors, and inserting changesets.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+If [available in Hex](https://hex.pm/docs/publish), the package can be installed by:
 
-  1. Add ja_resource to your list of dependencies in `mix.exs`:
+  1. Adding ja_resource to your list of dependencies in `mix.exs`:
 
         def deps do
           [{:ja_resource, "~> 0.0.1"}]
         end
 
-  2. Ensure ja_resource is started before your application:
+  2. Ensuring ja_resource is started before your application:
 
         def application do
           [applications: [:ja_resource]]
         end
 
-While not required, it is suggested to direct JaResource what repo to use in
+While not required, it is suggested to direct JaResource to what repo to use in
 controllers:
 
     config :ja_resource,
@@ -41,7 +41,7 @@ the standard restful controller actions for you, while providing many simple
 callbacks you can optionally implement to customize behaviour.
 
 To expose index, show, update, create, and delete of the `MyApp.Post` model
-with no retrictions:
+with no restrictions:
 
 ```elixir
 defmodule MyApp.V1.PostController do
@@ -50,7 +50,7 @@ defmodule MyApp.V1.PostController do
 end
 ```
 
-You can optional restrict JaResource to only implement the actions you don't
+You can optionally restrict JaResource to only implement the actions you don't
 want to define yourself (however there are better ways to tweak behavior):
 
 ```elixir
@@ -77,7 +77,7 @@ end
 ```
 
 You are also free to define any custom actions in your controller, JaResource
-will not interfear with them at all.
+will not interfere with them at all.
 
 ```elixir
 defmodule MyApp.V1.PostsController do
@@ -96,7 +96,7 @@ By default JaResource parses the controller name to determine the model exposed
 by the controller. `MyApp.UserController` will expose the `MyApp.User` model,
 `MyApp.API.V1.CommentController' will expose the `MyApp.Comment` model.
 
-This can easily be overriden by defining the `model/0` callback:
+This can easily be overridden by defining the `model/0` callback:
 
 ```elixir
 defmodule MyApp.V1.PostsController do
@@ -110,7 +110,7 @@ end
 ### Customizing records returned
 
 Many applications need to expose only subsets of a resource to a given user,
-those they have access too or maybe just models that are not soft deleted.
+those they have access to or maybe just models that are not soft deleted.
 JaResource allows you to define the `records/1` and `record/2`
 
 `records/1` is used by index, show, update, and delete requests to get the base
@@ -147,9 +147,9 @@ end
 
 ### 'Handle' Actions
 
-Every action not excluded defines a default `handle_` variant receives
-pre-processed data and is expected to return an Ecto query or record. All of 
-the handle calls may also return a conn (including the result of a render 
+Every action not excluded defines a default `handle_` variant which receives
+pre-processed data and is expected to return an Ecto query or record. All of
+the handle calls may also return a conn (including the result of a render
 call).
 
 An example of customizing the index and show actions (instead of customizing
