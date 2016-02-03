@@ -2,7 +2,6 @@ ExUnit.start()
 
 Application.put_env(:ja_resource, :repo, JaResourceTest.Repo)
 
-
 defmodule JaResourceTest.Repo do
   @moduledoc """
   A fake repo implimentation that just holds records in an agent.
@@ -49,6 +48,10 @@ end
 
 defmodule JaResourceTest.Post do
   defstruct [id: 0, title: "title", body: "body", slug: "slug"]
+end
+
+defmodule JaResourceTest.PostView do
+  def render(action, opts), do: %{action: action, data: opts[:data]}
 end
 
 JaResourceTest.Repo.start

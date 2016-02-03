@@ -1,4 +1,6 @@
 %{"decimal": {:hex, :decimal, "1.1.1"},
   "ecto": {:hex, :ecto, "1.1.1"},
+  "phoenix": {:hex, :phoenix, "1.1.4"},
   "plug": {:hex, :plug, "1.0.3"},
+  "poison": {:hex, :poison, "1.5.2"},
   "poolboy": {:hex, :poolboy, "1.5.1"}}

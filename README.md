@@ -144,3 +144,31 @@ defmodule MyApp.V1.PostController do
   end
 end
 ```
+
+### 'Handle' Actions
+
+Every action not excluded defines a default `handle_` variant receives
+pre-processed data and is expected to return an Ecto query or record. All of 
+the handle calls may also return a conn (including the result of a render 
+call).
+
+An example of customizing the index and show actions (instead of customizing
+`records/1` and `record/2`) would look something like this:
+
+```elixir
+defmodule MyApp.V1.PostController do
+  use MyApp.Web, :controller
+  use JaResource
+
+  def handle_index(conn, _params) do
+    case conn.assigns[:user] do
+      nil -> where(Post, [p], p.is_published == true)
+      u   -> Post # all posts
+    end
+  end
+
+  def handle_show(conn, id) do
+    Repo.get_by(Post, slug: id)
+  end
+end
+```
