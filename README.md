@@ -3,6 +3,17 @@
 A behaviour to reduce boilerplate in your JSON-API compliant Phoenix
 controllers without sacrificing flexibility.
 
+Exposing a resource becomes as simple as:
+
+```elixir
+defmodule MyApp.V1.PostController do
+  use MyApp.Web, :controller
+  use JaResource
+end
+```
+
+See [Usage](#usage) for more details on customizing.
+
 ## Rational
 
 JaResource lets you focus on the data in your APIs, instead of worrying about
