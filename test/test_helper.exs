@@ -18,15 +18,23 @@ defmodule JaResourceTest.Repo do
   end
 
   def one(query) do
-    Agent.get __MODULE__, fn(state) -> 
+    Agent.get __MODULE__, fn(state) ->
       Enum.find state, fn(record) ->
         record.__struct__ == query
       end
     end
   end
 
+  def all(query) do
+    Agent.get __MODULE__, fn(state) ->
+      Enum.filter state, fn(record) ->
+        record.__struct__ == query
+      end
+    end
+  end
+
   def get_by(query, [{field, val}]) do
-    Agent.get __MODULE__, fn(state) -> 
+    Agent.get __MODULE__, fn(state) ->
       Enum.find state, fn(record) ->
         record.__struct__ == query && Map.get(record, field) == val
       end
@@ -34,7 +42,7 @@ defmodule JaResourceTest.Repo do
   end
 
   def get(query, id) do
-    Agent.get __MODULE__, fn(state) -> 
+    Agent.get __MODULE__, fn(state) ->
       Enum.find state, fn(record) ->
         record.__struct__ == query && record.id == id
       end

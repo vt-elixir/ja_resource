@@ -1,6 +1,49 @@
 defmodule JaResource.Index do
   use Behaviour
 
+  @moduledoc """
+  Provides `index/2` action, and `filter/3`, `sort/3` and `handle_show/2` callbacks.
+
+  This behaviour is used by JaResource unless excluded by via only/except option.
+
+  It relies on (and uses):
+
+    * JaResource.Records
+    * JaResource.Serializable
+
+  When used JaResource.Index defines the `index/2` action suitable for handling
+  json-api requests.
+
+  To customize the behaviour of the index action the following callbacks can be implmented:
+
+    * handle_index/2
+    * filter/3
+    * sort/3
+    * JaResource.Records.records/1
+
+  """
+
+  @doc """
+  Returns the models to be represented by this resource.
+
+  Default implimentation is the result of the JaResource.Records.records/2
+  callback. Usually a module or an `%Ecto.Query{}`.
+
+  The results of this callback are passed to the filter and sort callbacks before the query is executed.
+
+  `handle_index/2` can alternatively return a conn with any response/body.
+
+  Example custom implimentation:
+
+      def handle_index(conn, _params) do
+        case conn.assigns[:user] do
+          nil  -> App.Post
+          user -> User.own_posts(user)
+        end
+      end
+
+  In most cases JaResource.Records.records/1 is the better customization hook.
+  """
   @callback handle_index(Plug.Conn.t, map) :: Plug.Conn.t | JaResource.records
 
   @callback filter(String.t, JaResource.records, String.t) :: JaResource.records
@@ -11,7 +54,6 @@ defmodule JaResource.Index do
       use JaResource.Serializable
       @behaviour JaResource.Index
       @before_compile JaResource.Index
-
 
       def index(conn, params) do
         conn
@@ -28,6 +70,7 @@ defmodule JaResource.Index do
     end
   end
 
+  @doc false
   defmacro __before_compile__(_) do
     quote do
       def filter(_, results, _), do: results
