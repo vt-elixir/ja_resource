@@ -183,3 +183,36 @@ defmodule MyApp.V1.PostController do
   end
 end
 ```
+
+### Creating and Updating
+
+Like index and show, customizing creating and updating resources can be done
+with the `handle_create/2` and `handle_update/3` actions, however if just
+customizing what attributes to use, prefer `permitted_attributes/3`.
+
+For example:
+
+```elixir
+defmodule MyApp.V1.PostController do
+  use MyApp.Web, :controller
+  use JaResource
+
+  def permitted_attributes(conn, attrs, :create) do
+    attrs
+    |> Map.take(~w(title body type category_id))
+    |> Map.merge("author_id", conn.assigns[:current_user])
+  end
+
+  def permitted_attributes(_conn, attrs, :update) do
+    Map.take(attrs, ~w(title body type category_id))
+  end
+end
+```
+
+Note: The attributes map passed into `permitted_attributes` is a "flattened"
+version including the values at `data/attributes`, `data/type` and any
+relationship values in `data/relationships/[name]/data/id` as `name_id`.
+
+
+
+

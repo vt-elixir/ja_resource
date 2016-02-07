@@ -10,7 +10,7 @@ defmodule JaResource.Create do
       use JaResource.Attributes
 
       def create(conn, params) do
-        merged = JaResource.attrs_from_params(params)
+        merged = JaResource.Attributes.from_params(params)
         attributes = permitted_attributes(conn, merged, :create)
         conn
         |> handle_create(attributes)

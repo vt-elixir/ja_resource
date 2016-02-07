@@ -5,7 +5,7 @@ defmodule JaResource.Records do
   Provides the `records/1` callback used for filtering records to be served.
 
   This behaviour is used by the following JaResource actions:
-    
+
     * JaResource.Index
     * JaResource.Show
     * JaResource.Update
@@ -18,8 +18,8 @@ defmodule JaResource.Records do
   """
 
   @doc """
-  Used to get the base query of records. 
-  
+  Used to get the base query of records.
+
   Many/most controllers will override this:
 
       def records(%Plug.Conn{assigns: %{user_id: user_id}}) do
@@ -35,7 +35,7 @@ defmodule JaResource.Records do
     quote do
       use JaResource.Model
       @behaviour JaResource.Records
-      
+
       def records(_conn), do: model()
 
       defoverridable [records: 1]

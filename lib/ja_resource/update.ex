@@ -12,7 +12,7 @@ defmodule JaResource.Update do
 
       def update(conn, %{"id" => id} = params) do
         model      = record(conn, id)
-        merged     = JaResource.attrs_from_params(params)
+        merged     = JaResource.Attributes.from_params(params)
         attributes = permitted_attributes(conn, merged, :update)
 
         conn

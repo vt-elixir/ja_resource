@@ -53,21 +53,4 @@ defmodule JaResource do
       end
     end
   end
-
-  @doc false
-  def attrs_from_params(%{"data" => %{"attributes" => attrs}} = params) do
-    params["data"]
-    |> parse_relationships
-    |> Map.merge(attrs)
-    |> Map.put_new("type", params["type"])
-  end
-
-  defp parse_relationships(%{"relationships" => nil}) do
-    %{}
-  end
-  defp parse_relationships(%{"relationships" => relationships}) do
-    Enum.reduce relationships, %{}, fn({name, %{"id" => id}}, rel) ->
-      Map.put(rel, "#{name}_id", id)
-    end
-  end
 end
