@@ -44,6 +44,12 @@ defmodule JaResource.AttributesTest do
         "relationships" => %{
           "category" => %{
             "data" => %{"type" => "category", "id" => "1"}
+          },
+          "tag" => %{
+            "data" => [
+              %{"type" => "tag", "id" => "1"},
+              %{"type" => "tag", "id" => "2"}
+            ]
           }
         }
       }
@@ -51,7 +57,8 @@ defmodule JaResource.AttributesTest do
     merged = %{
       "type" => "post",
       "title" => "a post",
-      "category_id" => "1"
+      "category_id" => "1",
+      "tag_id" => ["1", "2"]
     }
     actual = JaResource.Attributes.from_params(params)
     assert actual == merged

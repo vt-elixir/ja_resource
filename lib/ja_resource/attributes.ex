@@ -14,7 +14,7 @@ defmodule JaResource.Attributes do
   Used to determine which attributes are permitted during creat and update.
 
   The attributes map (the sencond argument) is a "flattened" version including
-  the values at `data/attributes`, `data/type` and any relationship values in 
+  the values at `data/attributes`, `data/type` and any relationship values in
   `data/relationships/[name]/data/id` as `name_id`.
 
   The third argument is the atom of the action being called.
@@ -62,8 +62,11 @@ defmodule JaResource.Attributes do
   end
 
   defp parse_relationships(%{"relationships" => rels}) do
-    Enum.reduce rels, %{}, fn({name, %{"data" => %{"id" => id}}}, rel) ->
-      Map.put(rel, "#{name}_id", id)
+    Enum.reduce rels, %{}, fn
+      ({name, %{"data" => %{"id" => id}}}, rel) ->
+        Map.put(rel, "#{name}_id", id)
+      ({name, %{"data" => ids}}, rel) when is_list(ids) ->
+        Map.put(rel, "#{name}_id", Enum.map(ids, &(&1["id"])))
     end
   end
 end
