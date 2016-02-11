@@ -33,7 +33,7 @@ defmodule JaResource.AttributesTest do
     assert actual == %{"title" => "a post"}
   end
 
-  test "formatting attributes from json-api params" do
+  test "formatting attributes from json-api params with relationships" do
     params = %{
       "data" => %{
         "id"   => "1",
@@ -59,6 +59,23 @@ defmodule JaResource.AttributesTest do
       "title" => "a post",
       "category_id" => "1",
       "tag_id" => ["1", "2"]
+    }
+    actual = JaResource.Attributes.from_params(params)
+    assert actual == merged
+  end
+
+  test "formatting minimal attributes from json-api params" do
+    params = %{
+      "data" => %{
+        "type" => "post",
+        "attributes" => %{
+          "title" => "a post"
+        }
+      }
+    }
+    merged = %{
+      "type" => "post",
+      "title" => "a post"
     }
     actual = JaResource.Attributes.from_params(params)
     assert actual == merged

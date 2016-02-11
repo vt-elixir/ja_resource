@@ -2,7 +2,7 @@ defmodule JaResource.Attributes do
   use Behaviour
 
   @moduledoc """
-  Provides the `formatting_attributes/3` callback used for filtering attributes.
+  Provides the `permitted_attributes/3` callback used for filtering attributes.
 
   This behaviour is used by the following JaResource actions:
 
@@ -68,5 +68,9 @@ defmodule JaResource.Attributes do
       ({name, %{"data" => ids}}, rel) when is_list(ids) ->
         Map.put(rel, "#{name}_id", Enum.map(ids, &(&1["id"])))
     end
+  end
+
+  defp parse_relationships(_) do
+    %{}
   end
 end

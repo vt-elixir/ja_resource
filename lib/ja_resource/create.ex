@@ -2,7 +2,49 @@ defmodule JaResource.Create do
   use Behaviour
   import Plug.Conn
 
-  @callback handle_create(Plug.Conn.t, JaResource.attributes) :: Plug.Conn.t | JaResource.record
+  @moduledoc """
+  Provides default `create/2` action implimenation, `handle_create/2` callback.
+
+  This behaviour is used by JaResource unless excluded by via only/except option.
+
+  It relies on (and uses):
+
+    * JaResource.Model
+    * JaResource.Attributes
+
+  When used JaResource.Create defines the `create/2` action suitable for
+  handling json-api requests.
+
+  To customize the behaviour of the create action the following callbacks can
+  be implmented:
+
+    * handle_create/2
+    * JaResource.Attributes.permitted_attributes/3
+
+  """
+
+  @doc """
+  Returns an unpersisted changeset or persisted model of the newly created object.
+
+  Default implimentation returns the results of calling
+  `Model.changeset(%Model{}, attrs)` where Model is the model defined by the
+  `JaResource.Model.model/0` callback.
+
+  The attributes argument is the result of the `permitted_attributes` function.
+
+  `handle_create/2` can return an %Ecto.Changeset, an Ecto.Schema struct,
+  a list of errors (`{:error, [email: "is not valid"]}` or a conn with
+  any response/body.
+
+
+  Example custom implimentation:
+
+      def handle_create(_conn, attributes) do
+        Post.changeset(%Post{}, attributes, :create_and_publish)
+      end
+
+  """
+  @callback handle_create(Plug.Conn.t, JaResource.attributes) :: Plug.Conn.t | Ecto.Changeset.t | JaResource.record | {:ok, JaResource.record} | {:error, JaResource.validation_errors}
 
   defmacro __using__(_) do
     quote do
@@ -18,16 +60,16 @@ defmodule JaResource.Create do
         |> JaResource.Create.respond(conn)
       end
 
-      def handle_create(_conn, attributes) do 
+      def handle_create(_conn, attributes) do
         __MODULE__.model.changeset(__MODULE__.model.__struct__, attributes)
       end
 
-      defoverridable [create: 2, handle_create: 2]
+      defoverridable [handle_create: 2]
     end
   end
 
   @doc false
-  def insert(%Ecto.Changeset{} = changeset, controller) do 
+  def insert(%Ecto.Changeset{} = changeset, controller) do
     controller.repo.insert(changeset)
   end
   if Code.ensure_loaded?(Ecto.Multi) do

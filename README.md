@@ -213,6 +213,28 @@ Note: The attributes map passed into `permitted_attributes` is a "flattened"
 version including the values at `data/attributes`, `data/type` and any
 relationship values in `data/relationships/[name]/data/id` as `name_id`.
 
+#### Handle Create
+
+Customizing creation can be done with the `handle_create/2` function. If this
+function returns a changeset it will be inserted and errors rendered if
+required. It may also return a model or validation errors for rendering
+or a %Plug.Conn{} for total rendering control.
+
+The attributes argument is the result of the `permitted_attributes` function.
+
+By default this will call `changeset/2` on the model defined by `model/0`.
+
+```elixir
+defmodule MyApp.V1.PostController do
+  use MyApp.Web, :controller
+  use JaResource
+
+  def handle_create(conn, attributes) do
+    Post.changeset(%Post{}, attributes, :create_and_publish)
+  end
+end
+```
+
 
 
 
