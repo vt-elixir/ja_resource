@@ -60,6 +60,26 @@ defmodule JaResourceTest.Repo do
   def insert(record) do
     {Agent.update(__MODULE__, &MapSet.put(&1, record)), record}
   end
+
+  def update(%Ecto.Changeset{valid?: true} = changeset) do
+    insert(changeset.model)
+  end
+
+  def update(%Ecto.Changeset{valid?: false} = changeset) do
+    {:error, changeset}
+  end
+
+  def update(new) do
+    Agent.update __MODULE__, fn(state) ->
+      old = Enum.find state, fn(record) ->
+        record.__struct__ == new.__struct__ && record.id == new.id
+      end
+      state
+      |> MapSet.delete(old)
+      |> MapSet.put(new)
+    end
+
+  end
 end
 
 # We don't actually need to use Ecto.Schema, just implement it's api.
@@ -82,7 +102,7 @@ end
 defmodule JaResourceTest.PostView do
   def render("errors.json", %{data: errors}),
     do: %{action: "errors.json", errors: render_errors(errors)}
-  def render(action, opts), 
+  def render(action, opts),
     do: %{action: action, data: opts[:data]}
 
   defp render_errors(%Ecto.Changeset{errors: errors}),

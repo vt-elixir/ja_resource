@@ -213,16 +213,9 @@ Note: The attributes map passed into `permitted_attributes` is a "flattened"
 version including the values at `data/attributes`, `data/type` and any
 relationship values in `data/relationships/[name]/data/id` as `name_id`.
 
-#### Handle Create
+#### Create
 
-Customizing creation can be done with the `handle_create/2` function. If this
-function returns a changeset it will be inserted and errors rendered if
-required. It may also return a model or validation errors for rendering
-or a %Plug.Conn{} for total rendering control.
-
-The attributes argument is the result of the `permitted_attributes` function.
-
-By default this will call `changeset/2` on the model defined by `model/0`.
+Customizing creation can be done with the `handle_create/2` function.
 
 ```elixir
 defmodule MyApp.V1.PostController do
@@ -235,6 +228,41 @@ defmodule MyApp.V1.PostController do
 end
 ```
 
+The attributes argument is the result of the `permitted_attributes` function.
 
+If this function returns a changeset it will be inserted and errors rendered if
+required. It may also return a model or validation errors for rendering
+or a %Plug.Conn{} for total rendering control.
 
+By default this will call `changeset/2` on the model defined by `model/0`.
+
+#### Update
+
+Customizing update can be done with the `handle_update/3` function.
+
+```elixir
+defmodule MyApp.V1.PostController do
+  use MyApp.Web, :controller
+  use JaResource
+
+  def handle_update(conn, post, attributes) do
+    current_user_id = conn.assigns[:current_user].id
+    case post.author_id do
+      ^current_user_id -> {:error, author_id: "you can only edit your own posts"}
+      _                -> Post.changeset(post, attributes, :update)
+    end
+  end
+end
+```
+
+If this function returns a changeset it will be inserted and errors rendered if
+required. It may also return a model or validation errors for rendering
+or a %Plug.Conn{} for total rendering control.
+
+The record argument (`post` in the above example) is the record found by the
+`record/3` callback. If `record/3` can not find a record it will be nil.
+
+The attributes argument is the result of the `permitted_attributes` function.
+
+By default this will call `changeset/2` on the model defined by `model/0`.
 

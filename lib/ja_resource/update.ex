@@ -2,6 +2,52 @@ defmodule JaResource.Update do
   use Behaviour
   import Plug.Conn
 
+  @moduledoc """
+  Provides default `update/2` action implemenation, `handle_update/3` callback.
+
+  This behaviour is used by JaResource unless excluded by via only/except option.
+
+  It relies on (and uses):
+
+    * JaResource.Record
+    * JaResource.Attributes
+
+  When used JaResource.Update defines the `update/2` action suitable for
+  handling json-api requests.
+
+  To customize the behaviour of the update action the following callbacks can
+  be implemented:
+
+    * record/2
+    * handle_update/3
+    * JaResource.Attributes.permitted_attributes/3
+
+  """
+
+  @doc """
+  Returns an unpersisted changeset or persisted model representing the newly update model.
+
+  Receives the conn, the model as found by `record/2`, and the attributes
+  argument from the `permitted_attributes` function.
+
+  Default implimentation returns the results of calling
+  `Model.changeset(model, attrs)`.
+
+  `handle_update/3` can return an %Ecto.Changeset, an Ecto.Schema struct,
+  a list of errors (`{:error, [email: "is not valid"]}` or a conn with
+  any response/body.
+
+  Example custom implimentation:
+
+      def handle_update(conn, post, attributes) do
+        current_user_id = conn.assigns[:current_user].id
+        case post.author_id do
+          ^current_user_id -> {:error, author_id: "you can only edit your own posts"}
+          _                -> Post.changeset(post, attributes, :update)
+        end
+      end
+
+  """
   @callback handle_update(Plug.Conn.t, JaResource.record, JaResource.attributes) :: Plug.Conn.t | JaResource.record | nil
 
   defmacro __using__(_) do
@@ -26,12 +72,12 @@ defmodule JaResource.Update do
         __MODULE__.model.changeset(model, attributes)
       end
 
-      defoverridable [update: 2, handle_update: 3]
+      defoverridable [handle_update: 3]
     end
   end
 
   @doc false
-  def update(%Ecto.Changeset{} = changeset, controller) do 
+  def update(%Ecto.Changeset{} = changeset, controller) do
     controller.repo.update(changeset)
   end
   if Code.ensure_loaded?(Ecto.Multi) do
@@ -41,8 +87,9 @@ defmodule JaResource.Update do
   end
   def update(other, _controller), do: other
 
+  @doc false
   def respond(%Plug.Conn{} = conn, _oldconn), do: conn
-  def respond(nil, conn), do: send_resp(conn, :not_found, nil)
+  def respond(nil, conn), do: send_resp(conn, :not_found, "")
   def respond({:error, errors}, conn), do: invalid(conn, errors)
   def respond({:ok, model}, conn), do: updated(conn, model)
   def respond(model, conn), do: updated(conn, model)

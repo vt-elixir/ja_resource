@@ -3,7 +3,7 @@ defmodule JaResource.Record do
 
   @moduledoc """
   This behaviour is used by the following JaResource actions:
-    
+
     * JaResource.Show
     * JaResource.Update
     * JaResource.Delete
@@ -16,12 +16,13 @@ defmodule JaResource.Record do
 
   @doc """
   Used to get the subject of the current action
-  
+
   Many/most controllers will override this:
 
-      def records(%Plug.Conn{assigns: %{user_id: user_id}}) do
+      def record(%Plug.Conn{assigns: %{user_id: user_id}}, id) do
         model()
         |> where([p], p.author_id == ^user_id)
+        |> Repo.get(id)
       end
 
   """
