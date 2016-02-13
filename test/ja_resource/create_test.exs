@@ -20,9 +20,9 @@ defmodule JaResource.CreateTest do
     use Phoenix.Controller
     use JaResource.Create
     def repo, do: JaResourceTest.Repo
-    def handle_create(_c, %{"title" => "valid"}), 
+    def handle_create(_c, %{"title" => "valid"}),
       do: {:ok, %JaResourceTest.Post{title: "valid"}}
-    def handle_create(_c, %{"title" => "invalid"}), 
+    def handle_create(_c, %{"title" => "invalid"}),
       do: {:error, [title: "is invalid"]}
   end
 

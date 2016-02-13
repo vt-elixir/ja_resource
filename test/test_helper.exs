@@ -76,9 +76,17 @@ defmodule JaResourceTest.Repo do
       end
       state
       |> MapSet.delete(old)
-      |> MapSet.put(new)
+      |> MapSet.put(Map.merge(old, new))
     end
+  end
 
+  def delete(to_delete) do
+    Agent.update __MODULE__, fn(state) ->
+      old = Enum.find state, fn(record) ->
+        record.__struct__ == to_delete.__struct__ && record.id == to_delete.id
+      end
+      MapSet.delete(state, old)
+    end
   end
 end
 

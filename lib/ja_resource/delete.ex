@@ -20,12 +20,12 @@ defmodule JaResource.Delete do
       def handle_delete(conn, nil), do: nil
       def handle_delete(conn, model), do: __MODULE__.repo.delete(model)
 
-      defoverridable [delete: 2, handle_delete: 2]
+      defoverridable [handle_delete: 2]
     end
   end
 
   def respond(nil, conn), do: not_found(conn)
-  def respond(%Plug.Conn{} = conn, conn), do: conn
+  def respond(%Plug.Conn{} = conn, _old_conn), do: conn
   def respond({:ok, _model}, conn), do: deleted(conn)
   def respond({:errors, errors}, conn), do: invalid(conn, errors)
   def respond(_model, conn), do: deleted(conn)
