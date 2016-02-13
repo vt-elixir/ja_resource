@@ -2,6 +2,43 @@ defmodule JaResource.Delete do
   use Behaviour
   import Plug.Conn
 
+  @moduledoc """
+  Provides default `delete/2` action implemenation, `handle_delete/3` callback.
+
+  This behaviour is used by JaResource unless excluded by via only/except option.
+
+  It relies on (and uses):
+
+    * JaResource.Record
+
+  When used JaResource.Delete defines the `delete/2` action suitable for
+  handling json-api requests.
+
+  To customize the behaviour of the update action the following callbacks can
+  be implemented:
+
+    * record/2
+    * handle_delete/2
+
+  """
+
+  @doc """
+  Returns an unpersisted changeset or persisted model representing the newly update model.
+
+  Receives the conn and the record as found by `record/2`.
+
+  Default implimentation returns the results of calling `Repo.delete(record)`.
+
+  Example custom implimentation:
+
+      def handle_delete(conn, record) do
+        case conn.assigns[:user] do
+          %{is_admin: true} -> super(conn, record)
+          _                 -> send_resp(conn, 401, "nope")
+        end
+      end
+
+  """
   @callback handle_delete(Plug.Conn.t, JaResource.record) :: Plug.Conn.t | JaResource.record | nil
 
   defmacro __using__(_) do
@@ -24,6 +61,7 @@ defmodule JaResource.Delete do
     end
   end
 
+  @doc false
   def respond(nil, conn), do: not_found(conn)
   def respond(%Plug.Conn{} = conn, _old_conn), do: conn
   def respond({:ok, _model}, conn), do: deleted(conn)

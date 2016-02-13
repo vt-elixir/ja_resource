@@ -266,3 +266,19 @@ The attributes argument is the result of the `permitted_attributes` function.
 
 By default this will call `changeset/2` on the model defined by `model/0`.
 
+#### Delete
+
+Customizing delete can be done with the `handle_delete/2` function.
+
+```elixir
+def handle_delete(conn, post) do
+  case conn.assigns[:user] do
+    %{is_admin: true} -> super(conn, post)
+    _                 -> send_resp(conn, 401, "nope")
+  end
+end
+```
+
+The record argument (`post` in the above example) is the record found by the
+`record/2` callback. If `record/2` can not find a record it will be nil.
+
