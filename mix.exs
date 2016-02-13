@@ -16,7 +16,7 @@ defmodule JaResource.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :phoenix]]
   end
 
   # Dependencies can be Hex packages:
@@ -31,7 +31,8 @@ defmodule JaResource.Mixfile do
   defp deps do
     [
       {:ecto, ">= 1.0.0"},
-      {:plug, ">= 1.0.0"}
+      {:plug, ">= 1.0.0"},
+      {:phoenix, ">= 1.0.0"}
     ]
   end
 
