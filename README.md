@@ -1,6 +1,6 @@
 # JaResource
 
-A behaviour to reduce boilerplate in your JSON-API compliant Phoenix
+A behaviour to reduce boilerplate code in your JSON-API compliant Phoenix
 controllers without sacrificing flexibility.
 
 Exposing a resource becomes as simple as:
@@ -12,9 +12,9 @@ defmodule MyApp.V1.PostController do
 end
 ```
 
-See [Usage](#usage) for more details on customizing.
+See [Usage](#usage) for more details on customizing and restricting endpoints.
 
-## Rational
+## Rationale
 
 JaResource lets you focus on the data in your APIs, instead of worrying about
 response status, rendering validation errors, and inserting changesets.
