@@ -61,8 +61,8 @@ defmodule MyApp.V1.PostController do
 end
 ```
 
-You can optionally restrict JaResource to only implement the actions you don't
-want to define yourself (however there are better ways to tweak behavior):
+You can optionally prevent JaResource from implementing actions you wish to define yourself
+(however there are better ways to tweak behavior):
 
 ```elixir
 defmodule MyApp.V1.PostsController do
