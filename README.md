@@ -37,11 +37,10 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
           [applications: [:ja_resource]]
         end
 
-While not required, it is suggested to direct JaResource to what repo to use in
-controllers:
+  3. ja_resource can be configured to execute queries on a given repo.  While not required, we encourage doing so to preserve clarity:
 
-    config :ja_resource,
-      repo: MyApp.Repo
+        config :ja_resource,
+          repo: MyApp.Repo
 
 
 ## Usage
