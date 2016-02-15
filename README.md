@@ -105,7 +105,7 @@ end
 
 By default JaResource parses the controller name to determine the model exposed
 by the controller. `MyApp.UserController` will expose the `MyApp.User` model,
-`MyApp.API.V1.CommentController' will expose the `MyApp.Comment` model.
+`MyApp.API.V1.CommentController` will expose the `MyApp.Comment` model.
 
 This can easily be overridden by defining the `model/0` callback:
 
