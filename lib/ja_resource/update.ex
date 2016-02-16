@@ -3,7 +3,7 @@ defmodule JaResource.Update do
   import Plug.Conn
 
   @moduledoc """
-  Provides default `update/2` action implemenation, `handle_update/3` callback.
+  Provides default `update/2` action implementation, `handle_update/3` callback.
 
   This behaviour is used by JaResource unless excluded by via only/except option.
 
@@ -25,19 +25,19 @@ defmodule JaResource.Update do
   """
 
   @doc """
-  Returns an unpersisted changeset or persisted model representing the newly update model.
+  Returns an unpersisted changeset or persisted model representing the newly updated model.
 
   Receives the conn, the model as found by `record/2`, and the attributes
   argument from the `permitted_attributes` function.
 
-  Default implimentation returns the results of calling
+  Default implementation returns the results of calling
   `Model.changeset(model, attrs)`.
 
   `handle_update/3` can return an %Ecto.Changeset, an Ecto.Schema struct,
   a list of errors (`{:error, [email: "is not valid"]}` or a conn with
   any response/body.
 
-  Example custom implimentation:
+  Example custom implementation:
 
       def handle_update(conn, post, attributes) do
         current_user_id = conn.assigns[:current_user].id

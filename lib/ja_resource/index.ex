@@ -14,7 +14,7 @@ defmodule JaResource.Index do
   When used JaResource.Index defines the `index/2` action suitable for handling
   json-api requests.
 
-  To customize the behaviour of the index action the following callbacks can be implmented:
+  To customize the behaviour of the index action the following callbacks can be implemented:
 
     * handle_index/2
     * filter/3
@@ -26,14 +26,14 @@ defmodule JaResource.Index do
   @doc """
   Returns the models to be represented by this resource.
 
-  Default implimentation is the result of the JaResource.Records.records/2
+  Default implementation is the result of the JaResource.Records.records/2
   callback. Usually a module or an `%Ecto.Query{}`.
 
   The results of this callback are passed to the filter and sort callbacks before the query is executed.
 
   `handle_index/2` can alternatively return a conn with any response/body.
 
-  Example custom implimentation:
+  Example custom implementation:
 
       def handle_index(conn, _params) do
         case conn.assigns[:user] do

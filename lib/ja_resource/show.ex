@@ -3,7 +3,7 @@ defmodule JaResource.Show do
   import Plug.Conn
 
   @moduledoc """
-  Provides default `show/2` action implimenation, `handle_show/2` callback.
+  Provides default `show/2` action implementation, `handle_show/2` callback.
 
   This behaviour is used by JaResource unless excluded by via only/except option.
 
@@ -13,9 +13,9 @@ defmodule JaResource.Show do
     * JaResource.Serializable
 
   When used JaResource.Show defines the `show/2` action suitable for handling
-  json-api requests. 
+  json-api requests.
 
-  To customize the behaviour of the show action the following callbacks can be implmented:
+  To customize the behaviour of the show action the following callbacks can be implemented:
 
     * handle_show/2
     * JaResource.Record.record/2
@@ -26,13 +26,13 @@ defmodule JaResource.Show do
   @doc """
   Returns the model to be represented by this resource.
 
-  Default implimentation is the result of the JaResource.Record.record/2
+  Default implementation is the result of the JaResource.Record.record/2
   callback.
 
-  `handle_show/2` can return nil to send a 404, a conn with any response/body, 
+  `handle_show/2` can return nil to send a 404, a conn with any response/body,
   or a record to be serialized.
 
-  Example custom implimentation:
+  Example custom implementation:
 
       def handle_show(conn, id) do
         Repo.get_by(Post, slug: id)

@@ -11,7 +11,7 @@ defmodule JaResource.Attributes do
   """
 
   @doc """
-  Used to determine which attributes are permitted during creat and update.
+  Used to determine which attributes are permitted during create and update.
 
   The attributes map (the sencond argument) is a "flattened" version including
   the values at `data/attributes`, `data/type` and any relationship values in

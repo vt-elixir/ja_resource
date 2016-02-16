@@ -23,7 +23,7 @@ defmodule JaResource.IndexTest do
     :ok
   end
 
-  test "default implimentation returns all records" do
+  test "default implementation returns all records" do
     conn = prep_conn(:get, "/posts/")
     response = DefaultController.index(conn, %{})
     assert response.status == 200
@@ -33,7 +33,7 @@ defmodule JaResource.IndexTest do
     assert [_, _] = json[:data]
   end
 
-  test "custom implimentation returns 401" do
+  test "custom implementation returns 401" do
     conn = prep_conn(:get, "/posts")
     response = CustomController.index(conn, %{})
     assert response.status == 401

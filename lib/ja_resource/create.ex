@@ -3,7 +3,7 @@ defmodule JaResource.Create do
   import Plug.Conn
 
   @moduledoc """
-  Provides default `create/2` action implimenation, `handle_create/2` callback.
+  Provides default `create/2` action implementation, `handle_create/2` callback.
 
   This behaviour is used by JaResource unless excluded by via only/except option.
 
@@ -16,7 +16,7 @@ defmodule JaResource.Create do
   handling json-api requests.
 
   To customize the behaviour of the create action the following callbacks can
-  be implmented:
+  be implemented:
 
     * handle_create/2
     * JaResource.Attributes.permitted_attributes/3
@@ -26,7 +26,7 @@ defmodule JaResource.Create do
   @doc """
   Returns an unpersisted changeset or persisted model of the newly created object.
 
-  Default implimentation returns the results of calling
+  Default implementation returns the results of calling
   `Model.changeset(%Model{}, attrs)` where Model is the model defined by the
   `JaResource.Model.model/0` callback.
 
@@ -37,7 +37,7 @@ defmodule JaResource.Create do
   any response/body.
 
 
-  Example custom implimentation:
+  Example custom implementation:
 
       def handle_create(_conn, attributes) do
         Post.changeset(%Post{}, attributes, :create_and_publish)
