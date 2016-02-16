@@ -23,40 +23,40 @@ defmodule JaResource.UpdateTest do
     end
   end
 
-  test "default implimentation renders 404 if record not found" do
+  test "default implementation renders 404 if record not found" do
     conn = prep_conn(:put, "/posts/404")
     response = DefaultController.update(conn, ja_attrs(404, %{"title" => "valid"}))
     assert response.status == 404
   end
 
-  test "default implimentation renders 200 if valid" do
+  test "default implementation renders 200 if valid" do
     {:ok, post} = JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 200})
     conn = prep_conn(:put, "/posts/#{post.id}")
     response = DefaultController.update(conn, ja_attrs(post.id, %{"title" => "valid"}))
     assert response.status == 200
   end
 
-  test "default implimentation renders 422 if invalid" do
+  test "default implementation renders 422 if invalid" do
     {:ok, post} = JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 422})
     conn = prep_conn(:put, "/posts/#{post.id}")
     response = DefaultController.update(conn, ja_attrs(post.id, %{"title" => "invalid"}))
     assert response.status == 422
   end
 
-  test "custom implimentation renders conn if returned" do
+  test "custom implementation renders conn if returned" do
     conn = prep_conn(:put, "/posts/420")
     response = CustomController.update(conn, ja_attrs(420, %{"title" => "valid"}))
     assert response.status == 420
   end
 
-  test "custom implimentation renders 200 if valid" do
+  test "custom implementation renders 200 if valid" do
     {:ok, post} = JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 200})
     conn = prep_conn(:put, "/posts/#{post.id}")
     response = CustomController.update(conn, ja_attrs(post.id, %{"title" => "valid"}))
     assert response.status == 200
   end
 
-  test "custom implimentation renders 422 if invalid" do
+  test "custom implementation renders 422 if invalid" do
     {:ok, post} = JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 422})
     conn = prep_conn(:put, "/posts/#{post.id}")
     response = CustomController.update(conn, ja_attrs(post.id, %{"title" => "invalid"}))

@@ -4,7 +4,7 @@ Application.put_env(:ja_resource, :repo, JaResourceTest.Repo)
 
 defmodule JaResourceTest.Repo do
   @moduledoc """
-  A fake repo implimentation that just holds records in an agent.
+  A fake repo implementation that just holds records in an agent.
 
   Usefull for testing w/o requiring a real repo.
   """

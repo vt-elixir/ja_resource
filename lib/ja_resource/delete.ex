@@ -3,7 +3,7 @@ defmodule JaResource.Delete do
   import Plug.Conn
 
   @moduledoc """
-  Provides default `delete/2` action implemenation, `handle_delete/3` callback.
+  Provides default `delete/2` action implementation, `handle_delete/3` callback.
 
   This behaviour is used by JaResource unless excluded by via only/except option.
 
@@ -23,13 +23,13 @@ defmodule JaResource.Delete do
   """
 
   @doc """
-  Returns an unpersisted changeset or persisted model representing the newly update model.
+  Returns an unpersisted changeset or persisted model representing the newly updated model.
 
   Receives the conn and the record as found by `record/2`.
 
-  Default implimentation returns the results of calling `Repo.delete(record)`.
+  Default implementation returns the results of calling `Repo.delete(record)`.
 
-  Example custom implimentation:
+  Example custom implementation:
 
       def handle_delete(conn, record) do
         case conn.assigns[:user] do

@@ -26,31 +26,31 @@ defmodule JaResource.CreateTest do
       do: {:error, [title: "is invalid"]}
   end
 
-  test "default implimentation renders 201 if valid" do
+  test "default implementation renders 201 if valid" do
     conn = prep_conn(:post, "/posts")
     response = DefaultController.create(conn, ja_attrs(%{"title" => "valid"}))
     assert response.status == 201
   end
 
-  test "default implimentation renders 422 if invalid" do
+  test "default implementation renders 422 if invalid" do
     conn = prep_conn(:post, "/posts")
     response = DefaultController.create(conn, ja_attrs(%{"title" => "invalid"}))
     assert response.status == 422
   end
 
-  test "custom implimentation accepts cons" do
+  test "custom implementation accepts cons" do
     conn = prep_conn(:post, "/posts")
     response = ProtectedController.create(conn, ja_attrs(%{"title" => "valid"}))
     assert response.status == 401
   end
 
-  test "custom implimentation handles {:ok, model}" do
+  test "custom implementation handles {:ok, model}" do
     conn = prep_conn(:post, "/posts")
     response = CustomController.create(conn, ja_attrs(%{"title" => "valid"}))
     assert response.status == 201
   end
 
-  test "custom implimentation handles {:error, errors}" do
+  test "custom implementation handles {:error, errors}" do
     conn = prep_conn(:post, "/posts")
     response = CustomController.create(conn, ja_attrs(%{"title" => "invalid"}))
     assert response.status == 422
