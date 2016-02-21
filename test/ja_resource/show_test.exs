@@ -20,6 +20,10 @@ defmodule JaResource.ShowTest do
     conn = prep_conn(:get, "/posts/404")
     response = DefaultController.show(conn, %{"id" => 404})
     assert response.status == 404
+    {:ok, body} = Poison.decode(response.resp_body)
+    assert body == %{"action" => "errors.json",
+                     "errors" => %{"detail" => "The resource was not found",
+                     "status" => 404, "title" => "Not Found"}}
   end
 
   test "default implementation return 200 if found" do
