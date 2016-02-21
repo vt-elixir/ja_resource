@@ -63,7 +63,14 @@ defmodule JaResource.Show do
 
   @doc false
   def respond(%Plug.Conn{} = conn, _old_conn, _controller), do: conn
-  def respond(nil, conn, _controller), do: send_resp(conn, :not_found, "")
+  def respond(nil, conn, _controller) do
+    conn
+    |> put_status(:not_found)
+    |> Phoenix.Controller.render(:errors, data: %{
+        status: 404,
+        title: "Not Found",
+        detail: "The resource was not found"})
+  end
   def respond(model, conn, controller) do
     opts = controller.serialization_opts(conn, conn.query_params)
     Phoenix.Controller.render(conn, :show, data: model, opts: opts)
