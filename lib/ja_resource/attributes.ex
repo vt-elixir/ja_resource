@@ -63,6 +63,7 @@ defmodule JaResource.Attributes do
 
   defp parse_relationships(%{"relationships" => rels}) do
     Enum.reduce rels, %{}, fn
+      ({name, %{"data" => nil}}, rel) -> rel
       ({name, %{"data" => %{"id" => id}}}, rel) ->
         Map.put(rel, "#{name}_id", id)
       ({name, %{"data" => ids}}, rel) when is_list(ids) ->
