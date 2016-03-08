@@ -58,7 +58,7 @@ defmodule JaResource.AttributesTest do
       "type" => "post",
       "title" => "a post",
       "category_id" => "1",
-      "tag_id" => ["1", "2"]
+      "tag_ids" => ["1", "2"]
     }
     actual = JaResource.Attributes.from_params(params)
     assert actual == merged
