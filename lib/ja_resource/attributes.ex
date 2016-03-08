@@ -67,7 +67,7 @@ defmodule JaResource.Attributes do
       ({name, %{"data" => %{"id" => id}}}, rel) ->
         Map.put(rel, "#{name}_id", id)
       ({name, %{"data" => ids}}, rel) when is_list(ids) ->
-        Map.put(rel, "#{name}_id", Enum.map(ids, &(&1["id"])))
+        Map.put(rel, "#{name}_ids", Enum.map(ids, &(&1["id"])))
     end
   end
 
