@@ -50,11 +50,13 @@ defmodule JaResource.Attributes do
   end
 
   @doc false
-  def from_params(%{"data" => %{"attributes" => attrs}} = params) do
-    params["data"]
+  def from_params(%{"data" => data}) do
+    attrs = data["attributes"] || %{}
+
+    data
     |> parse_relationships
     |> Map.merge(attrs)
-    |> Map.put_new("type", params["data"]["type"])
+    |> Map.put_new("type", data["type"])
   end
 
   defp parse_relationships(%{"relationships" => nil}) do
