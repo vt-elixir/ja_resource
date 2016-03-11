@@ -13,7 +13,7 @@ defmodule JaResource.Attributes do
   @doc """
   Used to determine which attributes are permitted during create and update.
 
-  The attributes map (the sencond argument) is a "flattened" version including
+  The attributes map (the second argument) is a "flattened" version including
   the values at `data/attributes`, `data/type` and any relationship values in
   `data/relationships/[name]/data/id` as `name_id`.
 
@@ -37,7 +37,7 @@ defmodule JaResource.Attributes do
       end
 
   """
-  @callback permitted_attributes(Plug.Conn.t, JaResource.attributes, :update | :create) :: JaResourse.attributes
+  @callback permitted_attributes(Plug.Conn.t, JaResource.attributes, :update | :create) :: JaResource.attributes
 
   defmacro __using__(_) do
     quote do
