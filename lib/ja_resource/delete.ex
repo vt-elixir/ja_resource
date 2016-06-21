@@ -1,7 +1,6 @@
 defmodule JaResource.Delete do
   use Behaviour
   import Plug.Conn
-  import Phoenix.Controller, only: [controller_module: 1]
 
   @moduledoc """
   Provides default `delete/2` action implementation, `handle_delete/3` callback.
@@ -53,8 +52,7 @@ defmodule JaResource.Delete do
     end
   end
 
-  def call(conn) do
-    controller = controller_module(conn)
+  def call(controller, conn) do
     model = controller.record(conn, conn.params["id"])
 
     conn

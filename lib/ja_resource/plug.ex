@@ -1,6 +1,7 @@
 defmodule JaResource.Plug do
   import Plug.Conn
   alias Phoenix.Controller
+  alias JaResource.{Index,Show,Create,Update,Delete}
   @behaviour Plug
 
   @available [:index, :show, :create, :update, :delete]
@@ -10,19 +11,20 @@ defmodule JaResource.Plug do
   end
 
   def call(conn, opts) do
-    action = Controller.action_name(conn)
+    action     = Controller.action_name(conn)
+    controller = Controller.controller_module(conn)
     if action in opts[:allowed] do
       conn
-      |> dispatch_resource(action)
+      |> dispatch(controller, action)
       |> halt
     else
       conn
     end
   end
 
-  defp dispatch_resource(conn, :index),  do: JaResource.Index.call(conn)
-  defp dispatch_resource(conn, :show),   do: JaResource.Show.call(conn)
-  defp dispatch_resource(conn, :create), do: JaResource.Create.call(conn)
-  defp dispatch_resource(conn, :update), do: JaResource.Update.call(conn)
-  defp dispatch_resource(conn, :delete), do: JaResource.Delete.call(conn)
+  defp dispatch(conn, controller, :index),  do: Index.call(controller, conn)
+  defp dispatch(conn, controller, :show),   do: Show.call(controller, conn)
+  defp dispatch(conn, controller, :create), do: Create.call(controller, conn)
+  defp dispatch(conn, controller, :update), do: Update.call(controller, conn)
+  defp dispatch(conn, controller, :delete), do: Delete.call(controller, conn)
 end

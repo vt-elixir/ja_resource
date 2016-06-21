@@ -1,7 +1,6 @@
 defmodule JaResource.Update do
   use Behaviour
   import Plug.Conn
-  import Phoenix.Controller, only: [controller_module: 1]
 
   @moduledoc """
   Provides default `update/2` action implementation, `handle_update/3` callback.
@@ -66,8 +65,7 @@ defmodule JaResource.Update do
     end
   end
 
-  def call(conn) do
-    controller = controller_module(conn)
+  def call(controller, conn) do
     model      = controller.record(conn, conn.params["id"])
     merged     = JaResource.Attributes.from_params(conn.params)
     attributes = controller.permitted_attributes(conn, merged, :update)

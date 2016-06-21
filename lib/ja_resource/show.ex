@@ -1,7 +1,6 @@
 defmodule JaResource.Show do
   use Behaviour
   import Plug.Conn
-  import Phoenix.Controller, only: [controller_module: 1]
 
   @moduledoc """
   Provides default `show/2` action implementation, `handle_show/2` callback.
@@ -56,8 +55,7 @@ defmodule JaResource.Show do
     end
   end
 
-  def call(conn) do
-    controller = controller_module(conn)
+  def call(controller, conn) do
     conn
     |> controller.handle_show(conn.params["id"])
     |> JaResource.Show.respond(conn, controller)

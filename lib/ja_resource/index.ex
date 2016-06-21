@@ -1,6 +1,5 @@
 defmodule JaResource.Index do
   use Behaviour
-  import Phoenix.Controller, only: [controller_module: 1]
 
   @moduledoc """
   Provides `index/2` action, and `filter/3`, `sort/3` and `handle_show/2` callbacks.
@@ -51,8 +50,7 @@ defmodule JaResource.Index do
   @callback sort(String.t, JaResource.records, String.t) :: JaResource.records
 
 
-  def call(conn) do
-    controller = controller_module(conn)
+  def call(controller, conn) do
     conn
     |> controller.handle_index(conn.params)
     |> JaResource.Index.filter(conn, controller)
