@@ -1,5 +1,6 @@
 defmodule JaResource.Index do
   use Behaviour
+  import Phoenix.Controller, only: [controller_module: 1]
 
   @moduledoc """
   Provides `index/2` action, and `filter/3`, `sort/3` and `handle_show/2` callbacks.
@@ -47,6 +48,18 @@ defmodule JaResource.Index do
   @callback handle_index(Plug.Conn.t, map) :: Plug.Conn.t | JaResource.records
 
   @callback filter(String.t, JaResource.records, String.t) :: JaResource.records
+  @callback sort(String.t, JaResource.records, String.t) :: JaResource.records
+
+
+  def call(conn) do
+    controller = controller_module(conn)
+    conn
+    |> controller.handle_index(conn.params)
+    |> JaResource.Index.filter(conn, controller)
+    |> JaResource.Index.sort(conn, controller)
+    |> JaResource.Index.execute_query(controller)
+    |> JaResource.Index.respond(conn, controller)
+  end
 
   defmacro __using__(_) do
     quote do
@@ -55,18 +68,9 @@ defmodule JaResource.Index do
       @behaviour JaResource.Index
       @before_compile JaResource.Index
 
-      def index(conn, params) do
-        conn
-        |> handle_index(params)
-        |> JaResource.Index.filter(conn, __MODULE__)
-        |> JaResource.Index.sort(conn, __MODULE__)
-        |> JaResource.Index.execute_query(__MODULE__)
-        |> JaResource.Index.respond(conn, __MODULE__)
-      end
-
       def handle_index(conn, params), do: records(conn)
 
-      defoverridable [index: 2, handle_index: 2]
+      defoverridable [handle_index: 2]
     end
   end
 

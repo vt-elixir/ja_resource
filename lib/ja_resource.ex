@@ -22,25 +22,20 @@ defmodule JaResource do
   """
   @callback repo() :: module
 
-  defmacro __using__(opts) do
+  defmacro __using__(_opts) do
     quote do
       @behaviour JaResource
-      unquote(JaResource.use_action_behaviours(opts))
       unquote(JaResource.default_repo)
-    end
-  end
 
-  @doc false
-  def use_action_behaviours(opts) do
-    available = [:index, :show, :create, :update, :delete]
-    allowed = (opts[:only] || available -- (opts[:except] || []))
+      # TODO: Extract JaResource.Repo to own module
+      #use JaResourse.Repo
+      use JaResource.Index
+      use JaResource.Show
+      use JaResource.Create
+      use JaResource.Update
+      use JaResource.Delete
 
-    quote bind_quoted: [allowed: allowed] do
-      if :index  in allowed, do: use JaResource.Index
-      if :show   in allowed, do: use JaResource.Show
-      if :create in allowed, do: use JaResource.Create
-      if :update in allowed, do: use JaResource.Update
-      if :delete in allowed, do: use JaResource.Delete
+      plug JaResource.Plug
     end
   end
 

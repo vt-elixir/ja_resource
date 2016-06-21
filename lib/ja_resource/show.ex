@@ -1,6 +1,7 @@
 defmodule JaResource.Show do
   use Behaviour
   import Plug.Conn
+  import Phoenix.Controller, only: [controller_module: 1]
 
   @moduledoc """
   Provides default `show/2` action implementation, `handle_show/2` callback.
@@ -49,16 +50,17 @@ defmodule JaResource.Show do
       use JaResource.Serializable
       @behaviour JaResource.Show
 
-      def show(conn, %{"id" => id}) do
-        conn
-        |> handle_show(id)
-        |> JaResource.Show.respond(conn, __MODULE__)
-      end
-
       def handle_show(conn, id), do: record(conn, id)
 
       defoverridable [handle_show: 2]
     end
+  end
+
+  def call(conn) do
+    controller = controller_module(conn)
+    conn
+    |> controller.handle_show(conn.params["id"])
+    |> JaResource.Show.respond(conn, controller)
   end
 
   @doc false

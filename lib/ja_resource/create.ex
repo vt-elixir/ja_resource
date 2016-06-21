@@ -1,6 +1,7 @@
 defmodule JaResource.Create do
   use Behaviour
   import Plug.Conn
+  import Phoenix.Controller, only: [controller_module: 1]
 
   @moduledoc """
   Provides default `create/2` action implementation, `handle_create/2` callback.
@@ -51,21 +52,22 @@ defmodule JaResource.Create do
       @behaviour JaResource.Create
       use JaResource.Attributes
 
-      def create(conn, params) do
-        merged = JaResource.Attributes.from_params(params)
-        attributes = permitted_attributes(conn, merged, :create)
-        conn
-        |> handle_create(attributes)
-        |> JaResource.Create.insert(__MODULE__)
-        |> JaResource.Create.respond(conn)
-      end
-
       def handle_create(_conn, attributes) do
         __MODULE__.model.changeset(__MODULE__.model.__struct__, attributes)
       end
 
       defoverridable [handle_create: 2]
     end
+  end
+
+  def call(conn) do
+    controller = controller_module(conn)
+    merged = JaResource.Attributes.from_params(conn.params)
+    attributes = controller.permitted_attributes(conn, merged, :create)
+    conn
+    |> controller.handle_create(attributes)
+    |> JaResource.Create.insert(controller)
+    |> JaResource.Create.respond(conn)
   end
 
   @doc false
