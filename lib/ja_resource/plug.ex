@@ -7,7 +7,13 @@ defmodule JaResource.Plug do
   @available [:index, :show, :create, :update, :delete]
 
   def init(opts) do
-    Keyword.put(opts, :allowed, (opts[:only] || @available -- (opts[:except] || [])))
+    allowed = cond do
+      opts[:only]   -> opts[:only] -- (opts[:only] -- @available)
+      opts[:except] -> @available -- opts[:except]
+      true          -> @available
+    end
+
+    [allowed: allowed]
   end
 
   def call(conn, opts) do
