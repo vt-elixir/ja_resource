@@ -61,6 +61,7 @@ defmodule JaResource.Index do
 
   defmacro __using__(_) do
     quote do
+      use JaResource.Repo
       use JaResource.Records
       use JaResource.Serializable
       @behaviour JaResource.Index

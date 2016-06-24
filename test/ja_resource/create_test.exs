@@ -1,6 +1,7 @@
 defmodule JaResource.CreateTest do
   use ExUnit.Case
   use Plug.Test
+  alias JaResource.Create
 
   defmodule DefaultController do
     use Phoenix.Controller
@@ -27,32 +28,32 @@ defmodule JaResource.CreateTest do
   end
 
   test "default implementation renders 201 if valid" do
-    conn = prep_conn(:post, "/posts")
-    response = DefaultController.create(conn, ja_attrs(%{"title" => "valid"}))
+    conn = prep_conn(:post, "/posts", ja_attrs(%{"title" => "valid"}))
+    response = Create.call(DefaultController, conn)
     assert response.status == 201
   end
 
   test "default implementation renders 422 if invalid" do
-    conn = prep_conn(:post, "/posts")
-    response = DefaultController.create(conn, ja_attrs(%{"title" => "invalid"}))
+    conn = prep_conn(:post, "/posts", ja_attrs(%{"title" => "invalid"}))
+    response = Create.call(DefaultController, conn)
     assert response.status == 422
   end
 
   test "custom implementation accepts cons" do
-    conn = prep_conn(:post, "/posts")
-    response = ProtectedController.create(conn, ja_attrs(%{"title" => "valid"}))
+    conn = prep_conn(:post, "/posts", ja_attrs(%{"title" => "valid"}))
+    response = Create.call(ProtectedController, conn)
     assert response.status == 401
   end
 
   test "custom implementation handles {:ok, model}" do
-    conn = prep_conn(:post, "/posts")
-    response = CustomController.create(conn, ja_attrs(%{"title" => "valid"}))
+    conn = prep_conn(:post, "/posts", ja_attrs(%{"title" => "valid"}))
+    response = Create.call(CustomController, conn)
     assert response.status == 201
   end
 
   test "custom implementation handles {:error, errors}" do
-    conn = prep_conn(:post, "/posts")
-    response = CustomController.create(conn, ja_attrs(%{"title" => "invalid"}))
+    conn = prep_conn(:post, "/posts", ja_attrs(%{"title" => "invalid"}))
+    response = Create.call(CustomController, conn)
     assert response.status == 422
   end
 

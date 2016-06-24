@@ -1,6 +1,7 @@
 defmodule JaResource.UpdateTest do
   use ExUnit.Case
   use Plug.Test
+  alias JaResource.Update
 
   defmodule DefaultController do
     use Phoenix.Controller
@@ -24,45 +25,44 @@ defmodule JaResource.UpdateTest do
   end
 
   test "default implementation renders 404 if record not found" do
-    conn = prep_conn(:put, "/posts/404")
-    response = DefaultController.update(conn, ja_attrs(404, %{"title" => "valid"}))
+    conn = prep_conn(:put, "/posts/404", ja_attrs(404, %{"title" => "valid"}))
+    response = Update.call(DefaultController, conn)
     assert response.status == 404
   end
 
   test "default implementation renders 200 if valid" do
     {:ok, post} = JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 200})
-    conn = prep_conn(:put, "/posts/#{post.id}")
-    response = DefaultController.update(conn, ja_attrs(post.id, %{"title" => "valid"}))
+    conn = prep_conn(:put, "/posts/#{post.id}", ja_attrs(post.id, %{"title" => "valid"}))
+    response = Update.call(DefaultController, conn)
     assert response.status == 200
   end
 
   test "default implementation renders 422 if invalid" do
     {:ok, post} = JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 422})
-    conn = prep_conn(:put, "/posts/#{post.id}")
-    response = DefaultController.update(conn, ja_attrs(post.id, %{"title" => "invalid"}))
+    conn = prep_conn(:put, "/posts/#{post.id}", ja_attrs(post.id, %{"title" => "invalid"}))
+    response = Update.call(DefaultController, conn)
     assert response.status == 422
   end
 
   test "custom implementation renders conn if returned" do
-    conn = prep_conn(:put, "/posts/420")
-    response = CustomController.update(conn, ja_attrs(420, %{"title" => "valid"}))
+    conn = prep_conn(:put, "/posts/420", ja_attrs(420, %{"title" => "valid"}))
+    response = Update.call(CustomController, conn)
     assert response.status == 420
   end
 
   test "custom implementation renders 200 if valid" do
     {:ok, post} = JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 200})
-    conn = prep_conn(:put, "/posts/#{post.id}")
-    response = CustomController.update(conn, ja_attrs(post.id, %{"title" => "valid"}))
+    conn = prep_conn(:put, "/posts/#{post.id}", ja_attrs(post.id, %{"title" => "valid"}))
+    response = Update.call(CustomController, conn)
     assert response.status == 200
   end
 
   test "custom implementation renders 422 if invalid" do
     {:ok, post} = JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 422})
-    conn = prep_conn(:put, "/posts/#{post.id}")
-    response = CustomController.update(conn, ja_attrs(post.id, %{"title" => "invalid"}))
+    conn = prep_conn(:put, "/posts/#{post.id}", ja_attrs(post.id, %{"title" => "invalid"}))
+    response = Update.call(CustomController, conn)
     assert response.status == 422
   end
-
 
   def prep_conn(method, path, params \\ %{}) do
     params = Map.merge(params, %{"_format" => "json"})
