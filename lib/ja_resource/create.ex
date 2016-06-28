@@ -3,23 +3,19 @@ defmodule JaResource.Create do
   import Plug.Conn
 
   @moduledoc """
-  Provides default `create/2` action implementation, `handle_create/2` callback.
-
-  This behaviour is used by JaResource unless excluded by via only/except option.
+  Defines a behaviour for creating a resource and the function to execute it.
 
   It relies on (and uses):
 
+    * JaResource.Repo
     * JaResource.Model
     * JaResource.Attributes
 
-  When used JaResource.Create defines the `create/2` action suitable for
-  handling json-api requests.
-
-  To customize the behaviour of the create action the following callbacks can
-  be implemented:
+  When used JaResource.Create defines the following overrideable callbacks:
 
     * handle_create/2
     * JaResource.Attributes.permitted_attributes/3
+    * JaResource.Repo.repo/1
 
   """
 
@@ -36,7 +32,6 @@ defmodule JaResource.Create do
   a list of errors (`{:error, [email: "is not valid"]}` or a conn with
   any response/body.
 
-
   Example custom implementation:
 
       def handle_create(_conn, attributes) do
@@ -49,6 +44,7 @@ defmodule JaResource.Create do
   defmacro __using__(_) do
     quote do
       @behaviour JaResource.Create
+      use JaResource.Repo
       use JaResource.Attributes
 
       def handle_create(_conn, attributes) do
@@ -59,6 +55,13 @@ defmodule JaResource.Create do
     end
   end
 
+  @doc """
+  Creates a resource given a module using Create and a connection.
+
+      Create.call(ArticleController, conn)
+
+  Dispatched by JaResource.Plug when phoenix action is create.
+  """
   def call(controller, conn) do
     merged = JaResource.Attributes.from_params(conn.params)
     attributes = controller.permitted_attributes(conn, merged, :create)

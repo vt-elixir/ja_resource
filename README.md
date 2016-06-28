@@ -8,16 +8,27 @@ Exposing a resource becomes as simple as:
 ```elixir
 defmodule MyApp.V1.PostController do
   use MyApp.Web, :controller
-  use JaResource
+  use JaResource # or add to web/web.ex
+  plug JaResource
 end
 ```
+
+JaResource intercepts requests for index, show, create, update, and delete
+actions and dispatches them through behaviour callbacks. Most resources need
+only customize a few callbacks. It is a webmachine like approach to building
+APIs on top of Phoenix.
 
 See [Usage](#usage) for more details on customizing and restricting endpoints.
 
 ## Rationale
 
 JaResource lets you focus on the data in your APIs, instead of worrying about
-response status, rendering validation errors, and inserting changesets.
+response status, rendering validation errors, and inserting changesets. You get
+robust patterns and while reducing maintainance overhead.
+
+At Agilion we value moving quickly while developing quality applications. This
+library has come out of our experience building many APIs in a variety of
+fields.
 
 ** DISCLAIMER: This is curretly pre-release software **
 
@@ -46,9 +57,14 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 ## Usage
 
 For the most simplistic resources JaSerializer lets you replace hundreds of
-lines of boilerplate with a simple use statement. JaResource simply defines
-the standard restful controller actions for you, while providing many simple
-callbacks you can optionally implement to customize behaviour.
+lines of boilerplate with a simple use and plug statements.
+
+The JaResource plug intercepts requests for standard actions and queries,
+filters, create changesets, applies changesets, responds appropriately and
+more all for you.
+
+Customizing each action just becomes implementing the callback relevant to
+what functionality you want to change.
 
 To expose index, show, update, create, and delete of the `MyApp.Post` model
 with no restrictions:
@@ -56,18 +72,21 @@ with no restrictions:
 ```elixir
 defmodule MyApp.V1.PostController do
   use MyApp.Web, :controller
-  use JaResource
+  use JaResource # Optionally put in web/web.ex
+  plug JaResource
 end
 ```
 
-You can optionally prevent JaResource from implementing actions you wish to define yourself
-(however there are better ways to tweak behavior):
+You can optionally prevent JaResource from intercepting actions completely as
+needed:
 
 ```elixir
 defmodule MyApp.V1.PostsController do
   use MyApp.Web, :controller
-  use JaResource, except: [:delete]
+  use JaResource
+  plug JaResource, except: [:delete]
 
+  # Standard Phoenix Delete
   def delete(conn, params) do
     # Custom delete logic
   end
@@ -75,7 +94,8 @@ end
 ```
 
 And because JaResource is just implementing actions, you can still use plug
-filters just like in normal Phoenix controllers:
+filters just like in normal Phoenix controllers, however you will want to
+call the JaResource plug last.
 
 ```elixir
 defmodule MyApp.V1.PostsController do
@@ -83,6 +103,7 @@ defmodule MyApp.V1.PostsController do
   use JaResource
 
   plug MyApp.Authenticate when action in [:create, :update, :delete]
+  plug JaResource
 end
 ```
 
@@ -93,6 +114,7 @@ will not interfere with them at all.
 defmodule MyApp.V1.PostsController do
   use MyApp.Web, :controller
   use JaResource
+  plug JaResource
 
   def publish(conn, params) do
    # Custom action logic
@@ -124,7 +146,7 @@ those they have access to or maybe just models that are not soft deleted.
 JaResource allows you to define the `records/1` and `record/2`
 
 `records/1` is used by index, show, update, and delete requests to get the base
-query of records. Many/most controllers will override this:
+query of records. Many controllers will override this:
 
 ```elixir
 defmodule MyApp.V1.MyPostController do
@@ -222,7 +244,7 @@ defmodule MyApp.V1.PostController do
   use JaResource
 
   def handle_create(conn, attributes) do
-    Post.changeset(%Post{}, attributes, :create_and_publish)
+    Post.publish_changeset(%Post{}, attributes)
   end
 end
 ```

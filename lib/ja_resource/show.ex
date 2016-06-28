@@ -3,9 +3,7 @@ defmodule JaResource.Show do
   import Plug.Conn
 
   @moduledoc """
-  Provides default `show/2` action implementation, `handle_show/2` callback.
-
-  This behaviour is used by JaResource unless excluded by via only/except option.
+  Defines a behaviour for displaying a resource and the function to execute it.
 
   It relies on (and uses):
 
@@ -55,6 +53,9 @@ defmodule JaResource.Show do
     end
   end
 
+  @doc """
+  Execute the show action on a given module implementing Show behaviour and conn.
+  """
   def call(controller, conn) do
     conn
     |> controller.handle_show(conn.params["id"])

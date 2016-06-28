@@ -2,12 +2,11 @@ defmodule JaResource.Index do
   use Behaviour
 
   @moduledoc """
-  Provides `index/2` action, and `filter/3`, `sort/3` and `handle_show/2` callbacks.
-
-  This behaviour is used by JaResource unless excluded by via only/except option.
+  Provides `handle_index/2`, `filter/3` and `sort/3` callbacks.
 
   It relies on (and uses):
 
+    * JaResource.Repo
     * JaResource.Records
     * JaResource.Serializable
 
@@ -20,6 +19,8 @@ defmodule JaResource.Index do
     * filter/3
     * sort/3
     * JaResource.Records.records/1
+    * JaResource.Repo.repo/0
+    * JaResource.Serializable.serialization_opts/2
 
   """
 
@@ -42,7 +43,8 @@ defmodule JaResource.Index do
         end
       end
 
-  In most cases JaResource.Records.records/1 is the better customization hook.
+  In most cases JaResource.Records.records/1, filter/3, and sort/3 are the 
+  better customization hooks.
   """
   @callback handle_index(Plug.Conn.t, map) :: Plug.Conn.t | JaResource.records
 
@@ -50,6 +52,9 @@ defmodule JaResource.Index do
   @callback sort(String.t, JaResource.records, String.t) :: JaResource.records
 
 
+  @doc """
+  Execute the index action on a given module implementing Index behaviour and conn.
+  """
   def call(controller, conn) do
     conn
     |> controller.handle_index(conn.params)

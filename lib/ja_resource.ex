@@ -7,7 +7,6 @@ defmodule JaResource do
 
   defmacro __using__(_opts) do
     quote do
-      use JaResource.Repo
       use JaResource.Index
       use JaResource.Show
       use JaResource.Create
@@ -15,4 +14,8 @@ defmodule JaResource do
       use JaResource.Delete
     end
   end
+
+  @behavour Plug
+  defdelegate init(opts),       to: JaResource.Plug
+  defdelegate call(conn, opts), to: JaResource.Plug
 end
