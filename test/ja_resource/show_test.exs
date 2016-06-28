@@ -1,6 +1,7 @@
 defmodule JaResource.ShowTest do
   use ExUnit.Case
   use Plug.Test
+  alias JaResource.Show
 
   defmodule DefaultController do
     use Phoenix.Controller
@@ -17,8 +18,8 @@ defmodule JaResource.ShowTest do
   end
 
   test "default implementation return 404 if not found" do
-    conn = prep_conn(:get, "/posts/404")
-    response = DefaultController.show(conn, %{"id" => 404})
+    conn = prep_conn(:get, "/posts/404", %{"id" => 404})
+    response = Show.call(DefaultController, conn)
     assert response.status == 404
     {:ok, body} = Poison.decode(response.resp_body)
     assert body == %{"action" => "errors.json",
@@ -27,15 +28,15 @@ defmodule JaResource.ShowTest do
   end
 
   test "default implementation return 200 if found" do
-    conn = prep_conn(:get, "/posts/200")
+    conn = prep_conn(:get, "/posts/200", %{"id" => 200})
     JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 200})
-    response = DefaultController.show(conn, %{"id" => 200})
+    response = Show.call(DefaultController, conn)
     assert response.status == 200
   end
 
   test "custom implementation return 401" do
-    conn = prep_conn(:get, "/posts/401")
-    response = CustomController.show(conn, %{"id" => 401})
+    conn = prep_conn(:get, "/posts/401", %{"id" => 401})
+    response = Show.call(CustomController, conn)
     assert response.status == 401
   end
 

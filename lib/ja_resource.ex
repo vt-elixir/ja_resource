@@ -1,56 +1,21 @@
 defmodule JaResource do
-  use Behaviour
-
   @type record :: map() | Ecto.Schema.t
   @type records :: module | Ecto.Query.t | list(record)
   @type params :: map()
   @type attributes :: map()
   @type id :: String.t
 
-  @doc """
-  Defines the module `use`-ing `Ecto.Repo` to be used by the controller.
-
-  Defaults to the value set in config if present:
-
-      config :ja_resource,
-         repo: MyApp.Repo
-
-  Default can be overridden per controller:
-
-      def repo, do: MyApp.SecondaryRepo
-
-  """
-  @callback repo() :: module
-
-  defmacro __using__(opts) do
+  defmacro __using__(_opts) do
     quote do
-      @behaviour JaResource
-      unquote(JaResource.use_action_behaviours(opts))
-      unquote(JaResource.default_repo)
+      use JaResource.Index
+      use JaResource.Show
+      use JaResource.Create
+      use JaResource.Update
+      use JaResource.Delete
     end
   end
 
-  @doc false
-  def use_action_behaviours(opts) do
-    available = [:index, :show, :create, :update, :delete]
-    allowed = (opts[:only] || available -- (opts[:except] || []))
-
-    quote bind_quoted: [allowed: allowed] do
-      if :index  in allowed, do: use JaResource.Index
-      if :show   in allowed, do: use JaResource.Show
-      if :create in allowed, do: use JaResource.Create
-      if :update in allowed, do: use JaResource.Update
-      if :delete in allowed, do: use JaResource.Delete
-    end
-  end
-
-  @doc false
-  def default_repo do
-    quote do
-      if Application.get_env(:ja_resource, :repo) do
-        def repo, do: Application.get_env(:ja_resource, :repo)
-        defoverridable [repo: 0]
-      end
-    end
-  end
+  @behavour Plug
+  defdelegate init(opts),       to: JaResource.Plug
+  defdelegate call(conn, opts), to: JaResource.Plug
 end

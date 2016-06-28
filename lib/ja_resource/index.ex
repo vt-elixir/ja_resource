@@ -2,12 +2,11 @@ defmodule JaResource.Index do
   use Behaviour
 
   @moduledoc """
-  Provides `index/2` action, and `filter/3`, `sort/3` and `handle_show/2` callbacks.
-
-  This behaviour is used by JaResource unless excluded by via only/except option.
+  Provides `handle_index/2`, `filter/3` and `sort/3` callbacks.
 
   It relies on (and uses):
 
+    * JaResource.Repo
     * JaResource.Records
     * JaResource.Serializable
 
@@ -20,6 +19,8 @@ defmodule JaResource.Index do
     * filter/3
     * sort/3
     * JaResource.Records.records/1
+    * JaResource.Repo.repo/0
+    * JaResource.Serializable.serialization_opts/2
 
   """
 
@@ -42,31 +43,38 @@ defmodule JaResource.Index do
         end
       end
 
-  In most cases JaResource.Records.records/1 is the better customization hook.
+  In most cases JaResource.Records.records/1, filter/3, and sort/3 are the 
+  better customization hooks.
   """
   @callback handle_index(Plug.Conn.t, map) :: Plug.Conn.t | JaResource.records
 
   @callback filter(String.t, JaResource.records, String.t) :: JaResource.records
+  @callback sort(String.t, JaResource.records, String.t) :: JaResource.records
+
+
+  @doc """
+  Execute the index action on a given module implementing Index behaviour and conn.
+  """
+  def call(controller, conn) do
+    conn
+    |> controller.handle_index(conn.params)
+    |> JaResource.Index.filter(conn, controller)
+    |> JaResource.Index.sort(conn, controller)
+    |> JaResource.Index.execute_query(controller)
+    |> JaResource.Index.respond(conn, controller)
+  end
 
   defmacro __using__(_) do
     quote do
+      use JaResource.Repo
       use JaResource.Records
       use JaResource.Serializable
       @behaviour JaResource.Index
       @before_compile JaResource.Index
 
-      def index(conn, params) do
-        conn
-        |> handle_index(params)
-        |> JaResource.Index.filter(conn, __MODULE__)
-        |> JaResource.Index.sort(conn, __MODULE__)
-        |> JaResource.Index.execute_query(__MODULE__)
-        |> JaResource.Index.respond(conn, __MODULE__)
-      end
-
       def handle_index(conn, params), do: records(conn)
 
-      defoverridable [index: 2, handle_index: 2]
+      defoverridable [handle_index: 2]
     end
   end
 

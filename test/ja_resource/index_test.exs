@@ -1,6 +1,7 @@
 defmodule JaResource.IndexTest do
   use ExUnit.Case
   use Plug.Test
+  alias JaResource.Index
 
   defmodule DefaultController do
     use Phoenix.Controller
@@ -25,7 +26,7 @@ defmodule JaResource.IndexTest do
 
   test "default implementation returns all records" do
     conn = prep_conn(:get, "/posts/")
-    response = DefaultController.index(conn, %{})
+    response = Index.call(DefaultController, conn)
     assert response.status == 200
 
     # Note, not real json-api spec view
@@ -35,7 +36,7 @@ defmodule JaResource.IndexTest do
 
   test "custom implementation returns 401" do
     conn = prep_conn(:get, "/posts")
-    response = CustomController.index(conn, %{})
+    response = Index.call(CustomController, conn)
     assert response.status == 401
   end
 

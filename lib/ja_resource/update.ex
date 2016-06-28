@@ -3,9 +3,7 @@ defmodule JaResource.Update do
   import Plug.Conn
 
   @moduledoc """
-  Provides default `update/2` action implementation, `handle_update/3` callback.
-
-  This behaviour is used by JaResource unless excluded by via only/except option.
+  Defines a behaviour for updating a resource and the function to execute it.
 
   It relies on (and uses):
 
@@ -18,7 +16,8 @@ defmodule JaResource.Update do
   To customize the behaviour of the update action the following callbacks can
   be implemented:
 
-    * record/2
+    * JaResource.Record.record/2
+    * JaResource.Records.records/1
     * handle_update/3
     * JaResource.Attributes.permitted_attributes/3
 
@@ -56,17 +55,6 @@ defmodule JaResource.Update do
       use JaResource.Attributes
       @behaviour JaResource.Update
 
-      def update(conn, %{"id" => id} = params) do
-        model      = record(conn, id)
-        merged     = JaResource.Attributes.from_params(params)
-        attributes = permitted_attributes(conn, merged, :update)
-
-        conn
-        |> handle_update(model, attributes)
-        |> JaResource.Update.update(__MODULE__)
-        |> JaResource.Update.respond(conn)
-      end
-
       def handle_update(conn, nil, _params), do: nil
       def handle_update(_conn, model, attributes) do
         __MODULE__.model.changeset(model, attributes)
@@ -74,6 +62,20 @@ defmodule JaResource.Update do
 
       defoverridable [handle_update: 3]
     end
+  end
+
+  @doc """
+  Execute the update action on a given module implementing Update behaviour and conn.
+  """
+  def call(controller, conn) do
+    model      = controller.record(conn, conn.params["id"])
+    merged     = JaResource.Attributes.from_params(conn.params)
+    attributes = controller.permitted_attributes(conn, merged, :update)
+
+    conn
+    |> controller.handle_update(model, attributes)
+    |> JaResource.Update.update(controller)
+    |> JaResource.Update.respond(conn)
   end
 
   @doc false

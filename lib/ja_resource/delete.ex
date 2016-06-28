@@ -3,12 +3,11 @@ defmodule JaResource.Delete do
   import Plug.Conn
 
   @moduledoc """
-  Provides default `delete/2` action implementation, `handle_delete/3` callback.
-
-  This behaviour is used by JaResource unless excluded by via only/except option.
+  Defines a behaviour for deleting a resource and the function to execute it.
 
   It relies on (and uses):
 
+    * JaResource.Repo
     * JaResource.Record
 
   When used JaResource.Delete defines the `delete/2` action suitable for
@@ -17,8 +16,9 @@ defmodule JaResource.Delete do
   To customize the behaviour of the update action the following callbacks can
   be implemented:
 
-    * record/2
     * handle_delete/2
+    * JaResource.Record.record/2
+    * JaResource.Repo.repo/0
 
   """
 
@@ -43,22 +43,25 @@ defmodule JaResource.Delete do
 
   defmacro __using__(_) do
     quote do
+      use JaResource.Repo
       use JaResource.Record
       @behaviour JaResource.Delete
-
-      def delete(conn, %{"id" => id}) do
-        model = record(conn, id)
-
-        conn
-        |> handle_delete(model)
-        |> JaResource.Delete.respond(conn)
-      end
-
       def handle_delete(conn, nil), do: nil
       def handle_delete(conn, model), do: __MODULE__.repo.delete(model)
 
       defoverridable [handle_delete: 2]
     end
+  end
+
+  @doc """
+  Execute the delete action on a given module implementing Delete behaviour and conn.
+  """
+  def call(controller, conn) do
+    model = controller.record(conn, conn.params["id"])
+
+    conn
+    |> controller.handle_delete(model)
+    |> JaResource.Delete.respond(conn)
   end
 
   @doc false
