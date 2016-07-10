@@ -205,6 +205,34 @@ defmodule MyApp.V1.PostController do
 end
 ```
 
+### Filtering and Sorting
+
+The handle_index has complimentary callbacks filter/4 and sort/4. These two
+callbacks are called once for each value in the related param. The filtering
+and sorting is done on the results of your `handle_index/2` callback (which
+defaults to the results of your `records/1` callback).
+
+For example, given the following request:
+
+`GET /v1/articles?filter[category]=dogs&sort=-published`
+
+You would implement the following callbacks:
+
+```elixir
+defmodule MyApp.ArticleController do
+  use MyApp.Web, :controller
+  use JaSerializer
+
+  def filter(_conn, query, "category", category) do
+    where(query, category: category)
+  end
+
+  def sort(_conn, query, "published", direction) do
+    order_by(query, [{direction, :inserted_at}])
+  end
+end
+```
+
 ### Creating and Updating
 
 Like index and show, customizing creating and updating resources can be done

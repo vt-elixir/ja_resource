@@ -4,6 +4,9 @@ defmodule JaResource.Records do
   @moduledoc """
   Provides the `records/1` callback used for querying records to be served.
 
+  This is typically the base query that you expose, often scoped to the
+  current user.
+
   This behaviour is used by the following JaResource actions:
 
     * JaResource.Index
