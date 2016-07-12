@@ -40,6 +40,11 @@ defmodule JaResource.IndexTest do
     assert response.status == 401
   end
 
+  @tag :skip
+  test "filtering adds conditional to query"
+  @tag :skip
+  test "sorting adds order statements to query"
+
   def prep_conn(method, path, params \\ %{}) do
     params = Map.merge(params, %{"_format" => "json"})
     conn(method, path, params)

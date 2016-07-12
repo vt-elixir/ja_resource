@@ -2,7 +2,7 @@ defmodule JaResource.Index do
   use Behaviour
 
   @moduledoc """
-  Provides `handle_index/2`, `filter/3` and `sort/3` callbacks.
+  Provides `handle_index/2`, `filter/4` and `sort/4` callbacks.
 
   It relies on (and uses):
 
@@ -16,8 +16,8 @@ defmodule JaResource.Index do
   To customize the behaviour of the index action the following callbacks can be implemented:
 
     * handle_index/2
-    * filter/3
-    * sort/3
+    * filter/4
+    * sort/4
     * JaResource.Records.records/1
     * JaResource.Repo.repo/0
     * JaResource.Serializable.serialization_opts/2
@@ -43,14 +43,64 @@ defmodule JaResource.Index do
         end
       end
 
-  In most cases JaResource.Records.records/1, filter/3, and sort/3 are the 
+  In most cases JaResource.Records.records/1, filter/4, and sort/4 are the
   better customization hooks.
   """
   @callback handle_index(Plug.Conn.t, map) :: Plug.Conn.t | JaResource.records
 
-  @callback filter(String.t, JaResource.records, String.t) :: JaResource.records
-  @callback sort(String.t, JaResource.records, String.t) :: JaResource.records
+  @doc """
+  Callback executed for each `filter` param.
 
+  For example, if you wanted to optionally filter on an Article's category and
+  issue, your request url might look like:
+
+      /api/articles?filter[category]=elixir&filter[issue]=12
+
+  You would then want two callbacks:
+
+      def filter(_conn, query, "category", category) do
+        where(query, category: category)
+      end
+
+      def filter(_conn, query, "issue", issue_id) do
+        where(query, issue_id: issue_id)
+      end
+
+  You can also use guards to whitelist a handeful of attributes:
+
+      @filterable_attrs ~w(title category author_id issue_id)
+      def filter(_conn, query, attr, val) when attr in @filterable_attrs do
+        where(query, [{String.to_existing_atom(attr), val}])
+      end
+
+  Anything not explicitly matched by your callbacks will be ignored.
+  """
+  @callback filter(Plug.Conn.t, JaResource.records, String.t, String.t) :: JaResource.records
+
+  @doc """
+  Callback executed for each value in the sort param.
+
+  Fourth argument is the direction as an atom, either `:asc` or `:desc` based
+  upon the presence or not of a `-` prefix.
+
+  For example if you wanted to sort by date then title your request url might
+  look like:
+
+      /api/articles?sort=-created,title
+
+  You would then want two callbacks:
+
+      def sort(_conn, query, "created", direction) do
+        order_by(query, [{direction, :inserted_at}])
+      end
+
+      def sort(_conn, query, "title", direction) do
+        order_by(query, [{direction, :title}])
+      end
+
+  Anything not explicitly matched by your callbacks will be ignored.
+  """
+  @callback sort(Plug.Conn.t, JaResource.records, String.t, :asc | :dsc) :: JaResource.records
 
   @doc """
   Execute the index action on a given module implementing Index behaviour and conn.
@@ -81,40 +131,34 @@ defmodule JaResource.Index do
   @doc false
   defmacro __before_compile__(_) do
     quote do
-      def filter(_, results, _), do: results
-      def sort(_, results, _), do: results
+      def filter(_conn, results,  _key, _val), do: results
+      def sort(_conn, results,  _key, _dir), do: results
     end
   end
 
   @doc false
-  def filter(results, conn, resource) do
-    case conn.params["filter"] do
-      nil -> results
-      %{} = filters ->
-        filters
-        |> Dict.keys
-        |> Enum.reduce(results, fn(k, acc) ->
-          resource.filter(k, acc, filters[k])
-        end)
-    end
+  def filter(results, conn = %{params: %{"filter" => filters}}, resource) do
+    filters
+    |> Dict.keys
+    |> Enum.reduce(results, fn(k, acc) ->
+      resource.filter(conn, acc, k, filters[k])
+    end)
   end
+  def filter(results, _conn, _controller), do: results
 
   @sort_regex ~r/(-?)(\S*)/
   @doc false
-  def sort(results, conn, controller) do
-    case conn.params["sort"] do
-      nil -> results
-      fields ->
-        fields
-        |> String.split(",")
-        |> Enum.reduce(results, fn(field, acc) ->
-          case Regex.run(@sort_regex, field) do
-            [_, "", field]  -> controller.sort(field, acc, :asc)
-            [_, "-", field] -> controller.sort(field, acc, :desc)
-          end
-        end)
-    end
+  def sort(results, conn = %{params: %{"sort" => fields}}, controller) do
+    fields
+    |> String.split(",")
+    |> Enum.reduce(results, fn(field, acc) ->
+      case Regex.run(@sort_regex, field) do
+        [_, "", field]  -> controller.sort(conn, acc, field, :asc)
+        [_, "-", field] -> controller.sort(conn, acc, field, :desc)
+      end
+    end)
   end
+  def sort(results, _conn, _controller), do: results
 
   @doc false
   def execute_query(%Ecto.Query{} = q, controller), do: controller.repo.all(q)
