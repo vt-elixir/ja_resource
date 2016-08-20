@@ -103,6 +103,19 @@ defmodule JaResource.Index do
   @callback sort(Plug.Conn.t, JaResource.records, String.t, :asc | :dsc) :: JaResource.records
 
   @doc """
+  Callback executed to query repo.
+
+  By default this just calls `all/2` on the repo. Can be customized for
+  pagination, monitoring, etc. For example to paginate with Scrivener:
+
+      def handle_index_query(%{query_params: qp}, query) do
+        repo().paginate(query, qp["page"] || %{})
+      end
+
+  """
+  @callback handle_index_query(Plug.Conn.t, Ecto.Query.t | module) :: any
+
+  @doc """
   Execute the index action on a given module implementing Index behaviour and conn.
   """
   def call(controller, conn) do
@@ -110,7 +123,7 @@ defmodule JaResource.Index do
     |> controller.handle_index(conn.params)
     |> JaResource.Index.filter(conn, controller)
     |> JaResource.Index.sort(conn, controller)
-    |> JaResource.Index.execute_query(controller)
+    |> JaResource.Index.execute_query(conn, controller)
     |> JaResource.Index.respond(conn, controller)
   end
 
@@ -122,8 +135,10 @@ defmodule JaResource.Index do
       @behaviour JaResource.Index
       @before_compile JaResource.Index
 
-      def handle_index(conn, params), do: records(conn)
+      def handle_index_query(_conn, query), do: repo().all(query)
+      defoverridable [handle_index_query: 2]
 
+      def handle_index(conn, params), do: records(conn)
       defoverridable [handle_index: 2]
     end
   end
@@ -161,10 +176,9 @@ defmodule JaResource.Index do
   def sort(results, _conn, _controller), do: results
 
   @doc false
-  def execute_query(%Ecto.Query{} = q, controller), do: controller.repo.all(q)
-  def execute_query(%Plug.Conn{} = conn, _controller), do: conn
-  def execute_query(m, controller) when is_atom(m), do: controller.repo.all(m)
-  def execute_query(results, _controller) when is_list(results), do: results
+  def execute_query(%Plug.Conn{} = conn, _conn, _controller), do: conn
+  def execute_query(results, _conn, _controller) when is_list(results), do: results
+  def execute_query(query, conn, controller), do: controller.handle_index_query(conn, query)
 
   @doc false
   def respond(%Plug.Conn{} = conn, _oldconn, _controller), do: conn
