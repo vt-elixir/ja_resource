@@ -50,7 +50,7 @@ defmodule JaResourceTest.Repo do
   end
 
   def insert(%Ecto.Changeset{valid?: true} = changeset) do
-    insert(changeset.model)
+    insert(changeset.data)
   end
 
   def insert(%Ecto.Changeset{valid?: false} = changeset) do
@@ -62,7 +62,7 @@ defmodule JaResourceTest.Repo do
   end
 
   def update(%Ecto.Changeset{valid?: true} = changeset) do
-    insert(changeset.model)
+    insert(changeset.data)
   end
 
   def update(%Ecto.Changeset{valid?: false} = changeset) do
@@ -101,8 +101,8 @@ defmodule JaResourceTest.Post do
       slug:  params["slug"]
     }
     case model.title do
-      "invalid" -> %Ecto.Changeset{model: model, valid?: false, errors: [title: "is invalid"]}
-      _         -> %Ecto.Changeset{model: model, valid?: true}
+      "invalid" -> %Ecto.Changeset{data: model, valid?: false, errors: [title: "is invalid"]}
+      _         -> %Ecto.Changeset{data: model, valid?: true}
     end
   end
 end
