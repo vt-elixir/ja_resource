@@ -1,5 +1,8 @@
 # JaResource
 
+[![Build Status](https://travis-ci.org/AgilionApps/ja_resource.svg?branch=master)](https://travis-ci.org/AgilionApps/ja_resource)
+[![Hex Version](https://img.shields.io/hexpm/v/ja_resource.svg)](https://hex.pm/packages/ja_resource)
+
 A behaviour to reduce boilerplate code in your JSON-API compliant Phoenix
 controllers without sacrificing flexibility.
 
@@ -39,7 +42,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
   1. Adding ja_resource to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:ja_resource, "~> 0.0.1"}]
+          [{:ja_resource, "~> 0.1.0"}]
         end
 
   2. Ensuring ja_resource is started before your application:
@@ -52,6 +55,8 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
         config :ja_resource,
           repo: MyApp.Repo
+
+  4. JaSerializer / JSON-API setup. JaResource is built to work with JaSerializer. Please refer to https://github.com/AgilionApps/ja_serializer#phoenix-usage to setup Plug and Phoenix for JaSerializer and JaResource.
 
 
 ## Usage
