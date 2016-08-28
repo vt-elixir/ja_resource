@@ -33,8 +33,6 @@ At Agilion we value moving quickly while developing quality applications. This
 library has come out of our experience building many APIs in a variety of
 fields.
 
-** DISCLAIMER: This is curretly pre-release software **
-
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed by:
