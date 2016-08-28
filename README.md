@@ -1,5 +1,8 @@
 # JaResource
 
+[![Build Status](https://travis-ci.org/AgilionApps/ja_resource.svg?branch=master)](https://travis-ci.org/AgilionApps/ja_resource)
+[![Hex Version](https://img.shields.io/hexpm/v/ja_resource.svg)](https://hex.pm/packages/ja_resource)
+
 A behaviour to reduce boilerplate code in your JSON-API compliant Phoenix
 controllers without sacrificing flexibility.
 
