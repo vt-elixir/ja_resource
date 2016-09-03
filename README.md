@@ -21,6 +21,11 @@ actions and dispatches them through behaviour callbacks. Most resources need
 only customize a few callbacks. It is a webmachine like approach to building
 APIs on top of Phoenix.
 
+JaResource is built to work in conjuction with sister library
+[JaSerializer](https://github.com/AgilionApps/ja_serializer). JaResource
+handles the controller side of things while JaSerializer is focused exclusively
+on view logic.
+
 See [Usage](#usage) for more details on customizing and restricting endpoints.
 
 ## Rationale
