@@ -38,7 +38,7 @@ defmodule JaResource do
     end
   end
 
-  @behavour Plug
+  @behaviour Plug
   defdelegate init(opts),       to: JaResource.Plug
   defdelegate call(conn, opts), to: JaResource.Plug
 end
