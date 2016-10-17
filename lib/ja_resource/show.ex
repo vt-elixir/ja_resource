@@ -73,7 +73,7 @@ defmodule JaResource.Show do
         detail: "The resource was not found"})
   end
   def respond(model, conn, controller) do
-    opts = controller.serialization_opts(conn, conn.query_params)
+    opts = controller.serialization_opts(conn, conn.query_params, model)
     Phoenix.Controller.render(conn, :show, data: model, opts: opts)
   end
 end

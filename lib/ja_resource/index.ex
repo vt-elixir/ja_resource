@@ -20,7 +20,7 @@ defmodule JaResource.Index do
     * sort/4
     * JaResource.Records.records/1
     * JaResource.Repo.repo/0
-    * JaResource.Serializable.serialization_opts/2
+    * JaResource.Serializable.serialization_opts/3
 
   """
 
@@ -183,7 +183,7 @@ defmodule JaResource.Index do
   @doc false
   def respond(%Plug.Conn{} = conn, _oldconn, _controller), do: conn
   def respond(models, conn, controller) do
-    opts = controller.serialization_opts(conn, conn.query_params)
+    opts = controller.serialization_opts(conn, conn.query_params, models)
     Phoenix.Controller.render(conn, :index, data: models, opts: opts)
   end
 end
