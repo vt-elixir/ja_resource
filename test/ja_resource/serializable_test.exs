@@ -8,8 +8,11 @@ defmodule JaResource.SerializableTest do
   defmodule Override do
     use JaResource.Serializable
 
-    def serialization_opts(_conn, params) do
-      [fields: %{"article" => params["fields"]["post"]}]
+    def serialization_opts(_conn, params, models) do
+      [
+        fields: %{"article" => params["fields"]["post"]},
+        meta: %{total_records: models |> Enum.count}
+      ]
     end
   end
 
@@ -17,35 +20,39 @@ defmodule JaResource.SerializableTest do
     conn = %Plug.Conn{}
     given = %{}
     expected = []
-    assert Default.serialization_opts(conn, given) == expected
+    assert Default.serialization_opts(conn, given, %{}) == expected
   end
 
   test "default behaviour - both opts" do
     conn = %Plug.Conn{}
     given = %{"fields" => %{"post" => "title,body"}, "include" => "author"}
     expected = [include: "author", fields: %{"post" => "title,body"}]
-    assert Default.serialization_opts(conn, given) == expected
+    assert Default.serialization_opts(conn, given, %{}) == expected
   end
 
   test "default behaviour - field only" do
     conn = %Plug.Conn{}
     given = %{"fields" => %{"post" => "title,body"}}
     expected = [fields: %{"post" => "title,body"}]
-    assert Default.serialization_opts(conn, given) == expected
+    assert Default.serialization_opts(conn, given, %{}) == expected
   end
 
   test "default behaviour - include only" do
     conn = %Plug.Conn{}
     given = %{"include" => "author"}
     expected = [include: "author"]
-    assert Default.serialization_opts(conn, given) == expected
+    assert Default.serialization_opts(conn, given, %{}) == expected
   end
 
   test "overridden behaviour" do
     conn = %Plug.Conn{}
-    given = %{"fields" => %{"post" => "title,body"}}
-    expected = [fields: %{"article" => "title,body"}]
-    assert Override.serialization_opts(conn, given) == expected
-  end
+    params = %{"fields" => %{"post" => "title,body"}}
+    models = [1,2,3]
+    expected = [
+      fields: %{"article" => "title,body"},
+      meta: %{total_records: 3}
+    ]
 
+    assert Override.serialization_opts(conn, params, models) == expected
+  end
 end
