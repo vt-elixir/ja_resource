@@ -59,6 +59,8 @@ defmodule JaResource.Delete do
   def call(controller, conn) do
     model = controller.record(conn, conn.params["id"])
 
+    controller.handle_authorize(model, conn)
+
     conn
     |> controller.handle_delete(model)
     |> JaResource.Delete.respond(conn)

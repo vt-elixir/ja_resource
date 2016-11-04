@@ -65,6 +65,9 @@ defmodule JaResource.Create do
   def call(controller, conn) do
     merged = JaResource.Attributes.from_params(conn.params)
     attributes = controller.permitted_attributes(conn, merged, :create)
+
+    controller.handle_authorize(controller.model(), conn)
+
     conn
     |> controller.handle_create(attributes)
     |> JaResource.Create.insert(controller)

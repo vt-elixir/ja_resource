@@ -119,6 +119,8 @@ defmodule JaResource.Index do
   Execute the index action on a given module implementing Index behaviour and conn.
   """
   def call(controller, conn) do
+    controller.handle_authorize(controller.model(), conn)
+
     conn
     |> controller.handle_index(conn.params)
     |> JaResource.Index.filter(conn, controller)

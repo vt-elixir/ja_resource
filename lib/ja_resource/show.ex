@@ -57,9 +57,11 @@ defmodule JaResource.Show do
   Execute the show action on a given module implementing Show behaviour and conn.
   """
   def call(controller, conn) do
-    conn
-    |> controller.handle_show(conn.params["id"])
-    |> JaResource.Show.respond(conn, controller)
+    model = controller.handle_show(conn, conn.params["id"])
+
+    controller.handle_authorize(model, conn)
+
+    JaResource.Show.respond(model, conn, controller)
   end
 
   @doc false

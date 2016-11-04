@@ -72,6 +72,8 @@ defmodule JaResource.Update do
     merged     = JaResource.Attributes.from_params(conn.params)
     attributes = controller.permitted_attributes(conn, merged, :update)
 
+    controller.handle_authorize(model, conn)
+
     conn
     |> controller.handle_update(model, attributes)
     |> JaResource.Update.update(controller)

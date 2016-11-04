@@ -25,6 +25,7 @@ defmodule JaResource.Model do
   defmacro __using__(_) do
     quote do
       @behaviour JaResource.Model
+      use JaResource.Authorize
 
       @inferred_model JaResource.Model.model_from_controller(__MODULE__)
       def model(), do: @inferred_model
