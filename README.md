@@ -178,8 +178,9 @@ defmodule MyApp.V1.PostController do
   use MyApp.Web, :controller
   use JaResource
 
-  def record(query, slug_as_id) do
-    query
+  def record(conn, slug_as_id) do
+    conn
+    |> records
     |> MyApp.Repo.get_by(slug: slug_as_id)
   end
 end
