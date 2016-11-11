@@ -94,6 +94,7 @@ defmodule JaResource.Update do
   @doc false
   def respond(%Plug.Conn{} = conn, _oldconn), do: conn
   def respond(nil, conn), do: send_resp(conn, :not_found, "")
+  def respond({:error, _name, errors, _changes}, conn), do: invalid(conn, errors)
   def respond({:error, errors}, conn), do: invalid(conn, errors)
   def respond({:ok, model}, conn), do: updated(conn, model)
   def respond(model, conn), do: updated(conn, model)
