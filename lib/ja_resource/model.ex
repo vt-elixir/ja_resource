@@ -30,6 +30,15 @@ defmodule JaResource.Model do
       @inferred_model JaResource.Model.model_from_controller(__MODULE__)
       def model(), do: @inferred_model
 
+      def atom() do
+        model()
+        |> Atom.to_string
+        |> String.split(".")
+        |> List.last
+        |> String.downcase
+        |> String.to_atom
+      end
+
       defoverridable [model: 0]
     end
   end
