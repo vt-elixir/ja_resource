@@ -17,6 +17,14 @@ defmodule JaResource.IndexTest do
     def handle_index(conn, _id), do: send_resp(conn, 401, "")
   end
 
+  defmodule QueryErrorController do
+    use Phoenix.Controller
+    use JaResource.Index
+    def repo, do: JaResourceTest.Repo
+    def handle_index_query(_conn, _params),
+      do: {:error, [details: "An error"]}
+  end
+
   setup do
     JaResourceTest.Repo.reset
     JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 1})
@@ -38,6 +46,14 @@ defmodule JaResource.IndexTest do
     conn = prep_conn(:get, "/posts")
     response = Index.call(CustomController, conn)
     assert response.status == 401
+  end
+
+  test "query errors are handled correctly" do
+    conn = prep_conn(:get, "/posts")
+    response = Index.call(QueryErrorController, conn)
+    json = Poison.decode!(response.resp_body, keys: :atoms!)
+    assert json[:errors] == %{details: "An error"}
+    assert response.status == 500
   end
 
   @tag :skip

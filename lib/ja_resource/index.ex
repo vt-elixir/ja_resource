@@ -1,5 +1,6 @@
 defmodule JaResource.Index do
   use Behaviour
+  import Plug.Conn, only: [put_status: 2]
 
   @moduledoc """
   Provides `handle_index/2`, `filter/4` and `sort/4` callbacks.
@@ -182,8 +183,15 @@ defmodule JaResource.Index do
 
   @doc false
   def respond(%Plug.Conn{} = conn, _oldconn, _controller), do: conn
+  def respond({:error, errors}, conn, _controller), do: error(conn, errors)
   def respond(models, conn, controller) do
     opts = controller.serialization_opts(conn, conn.query_params, models)
     Phoenix.Controller.render(conn, :index, data: models, opts: opts)
+  end
+
+  defp error(conn, errors) do
+    conn
+    |> put_status(:internal_server_error)
+    |> Phoenix.Controller.render(:errors, data: errors)
   end
 end
