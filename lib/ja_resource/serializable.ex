@@ -10,23 +10,23 @@ defmodule JaResource.Serializable do
   controller. For example:
 
       def serialization_opts(_conn, params, _models) do
-        %{
+        [
           fields: params["fields"] || %{"post" => "title,body"}
-        }
+        ]
       end
 
   As another example, the callback could be used to add a meta map to the JSON
   payload, such as for pagination info, when using scrivener.
 
       def serialization_opts(_conn, _params, models) do
-        %{
+        [
           meta: %{
             current_page: models.page_number,
             page_size: models.page_size,
             total_pages: models.total_pages,
             total_records: models.total_entries
           }
-        }
+        ]
       end
 
   Note that `models` will be a Scrivener page struct, if `handle_index_query` was
