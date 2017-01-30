@@ -233,7 +233,7 @@ defmodule MyApp.ArticleController do
   use JaSerializer
 
   def filter(_conn, query, "category", category) do
-    where(query, category: category)
+    where(query, category: ^category)
   end
 
   def sort(_conn, query, "published", direction) do
