@@ -65,6 +65,9 @@ defmodule JaResource.Create do
   def call(controller, conn) do
     merged = JaResource.Attributes.from_params(conn.params)
     attributes = controller.permitted_attributes(conn, merged, :create)
+
+    controller.handle_authorize(controller.model(), conn)
+
     conn
     |> controller.handle_create(attributes)
     |> JaResource.Create.insert(controller)
@@ -84,7 +87,9 @@ defmodule JaResource.Create do
 
   @doc false
   def respond(%Plug.Conn{} = conn, _old_conn), do: conn
+  def respond({:error, _name, errors, _changes}, conn), do: invalid(conn, errors)
   def respond({:error, errors}, conn), do: invalid(conn, errors)
+  def respond({:ok, %{} = map}, conn), do: created(conn, Map.fetch(map, controller.atom()))
   def respond({:ok, model}, conn), do: created(conn, model)
   def respond(model, conn), do: created(conn, model)
 

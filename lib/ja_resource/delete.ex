@@ -59,6 +59,8 @@ defmodule JaResource.Delete do
   def call(controller, conn) do
     model = controller.record(conn, conn.params["id"])
 
+    controller.handle_authorize(model, conn)
+
     conn
     |> controller.handle_delete(model)
     |> JaResource.Delete.respond(conn)
@@ -67,7 +69,9 @@ defmodule JaResource.Delete do
   @doc false
   def respond(nil, conn), do: not_found(conn)
   def respond(%Plug.Conn{} = conn, _old_conn), do: conn
+  def respond({:ok, %{} = map}, conn), do: created(conn, Map.fetch(map, controller.atom()))
   def respond({:ok, _model}, conn), do: deleted(conn)
+  def respond({:error, _name, errors, _changes}, conn), do: invalid(conn, errors)
   def respond({:errors, errors}, conn), do: invalid(conn, errors)
   def respond(_model, conn), do: deleted(conn)
 
