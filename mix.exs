@@ -8,9 +8,9 @@ defmodule JaResource.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      source_url: "https://github.com/AgilionApps/ja_resource",
-     package: package,
-     description: description,
-     deps: deps]
+     package: package(),
+     description: description(),
+     deps: deps()]
   end
 
   # Configuration for the OTP application

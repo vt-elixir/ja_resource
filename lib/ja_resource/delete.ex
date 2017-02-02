@@ -47,7 +47,7 @@ defmodule JaResource.Delete do
       use JaResource.Record
       @behaviour JaResource.Delete
       def handle_delete(conn, nil), do: nil
-      def handle_delete(conn, model), do: __MODULE__.repo.delete(model)
+      def handle_delete(conn, model), do: __MODULE__.repo().delete(model)
 
       defoverridable [handle_delete: 2]
     end

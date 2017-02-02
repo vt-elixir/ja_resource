@@ -80,11 +80,11 @@ defmodule JaResource.Update do
 
   @doc false
   def update(%Ecto.Changeset{} = changeset, controller) do
-    controller.repo.update(changeset)
+    controller.repo().update(changeset)
   end
   if Code.ensure_loaded?(Ecto.Multi) do
     def update(%Ecto.Multi{} = multi, controller) do
-      controller.repo.transaction(multi)
+      controller.repo().transaction(multi)
     end
   end
   def update(other, _controller), do: other
