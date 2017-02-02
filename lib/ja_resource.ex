@@ -4,6 +4,7 @@ defmodule JaResource do
   @type params :: map()
   @type attributes :: map()
   @type id :: String.t
+  @type validation_errors :: {:error, Ecto.Changeset.t}
 
   @moduledoc """
   When used, includes all restful actions behaviours. Also a plug.
