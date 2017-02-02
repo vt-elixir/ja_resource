@@ -36,7 +36,7 @@ defmodule JaResource.Record do
       def record(conn, id) do
         conn
         |> records
-        |> repo.get(id)
+        |> repo().get(id)
       end
 
       defoverridable [record: 2]

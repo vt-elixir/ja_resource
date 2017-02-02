@@ -18,7 +18,7 @@ defmodule JaResource.Repo do
   defmacro __using__(_opts) do
     quote do
       @behaviour JaResource.Repo
-      unquote(default_repo)
+      unquote(default_repo())
     end
   end
 

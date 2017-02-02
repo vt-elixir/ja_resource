@@ -73,11 +73,11 @@ defmodule JaResource.Create do
 
   @doc false
   def insert(%Ecto.Changeset{} = changeset, controller) do
-    controller.repo.insert(changeset)
+    controller.repo().insert(changeset)
   end
   if Code.ensure_loaded?(Ecto.Multi) do
     def insert(%Ecto.Multi{} = multi, controller) do
-      controller.repo.transaction(multi)
+      controller.repo().transaction(multi)
     end
   end
   def insert(other, _controller), do: other
