@@ -34,8 +34,6 @@ defmodule JaResource.Serializable do
 
   """
 
-  use Behaviour
-
   @doc """
   Converts full list of params into serialization opts.
 

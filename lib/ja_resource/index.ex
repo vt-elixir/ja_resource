@@ -1,5 +1,4 @@
 defmodule JaResource.Index do
-  use Behaviour
   import Plug.Conn, only: [put_status: 2]
 
   @moduledoc """
@@ -155,7 +154,7 @@ defmodule JaResource.Index do
   @doc false
   def filter(results, conn = %{params: %{"filter" => filters}}, resource) do
     filters
-    |> Dict.keys
+    |> Map.keys
     |> Enum.reduce(results, fn(k, acc) ->
       resource.filter(conn, acc, k, filters[k])
     end)

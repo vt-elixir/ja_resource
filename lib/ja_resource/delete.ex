@@ -1,5 +1,4 @@
 defmodule JaResource.Delete do
-  use Behaviour
   import Plug.Conn
 
   @moduledoc """

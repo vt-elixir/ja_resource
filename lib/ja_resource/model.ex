@@ -1,6 +1,4 @@
 defmodule JaResource.Model do
-  use Behaviour
-
   @moduledoc """
   Provides the `model/0` callback used to customize the resource served.
 

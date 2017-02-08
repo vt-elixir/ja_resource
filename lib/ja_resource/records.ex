@@ -1,6 +1,4 @@
 defmodule JaResource.Records do
-  use Behaviour
-
   @moduledoc """
   Provides the `records/1` callback used for querying records to be served.
 
