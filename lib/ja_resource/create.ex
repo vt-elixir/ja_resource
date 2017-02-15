@@ -1,6 +1,4 @@
 defmodule JaResource.Create do
-  import Plug.Conn
-
   @moduledoc """
   Defines a behaviour for creating a resource and the function to execute it.
 
@@ -13,6 +11,8 @@ defmodule JaResource.Create do
   When used JaResource.Create defines the following overrideable callbacks:
 
     * handle_create/2
+    * handle_invalid_create/2
+    * render_create/2
     * JaResource.Attributes.permitted_attributes/3
     * JaResource.Repo.repo/1
 
@@ -40,17 +40,45 @@ defmodule JaResource.Create do
   """
   @callback handle_create(Plug.Conn.t, JaResource.attributes) :: Plug.Conn.t | Ecto.Changeset.t | JaResource.record | {:ok, JaResource.record} | {:error, JaResource.validation_errors}
 
+  @doc """
+  Returns a `Plug.Conn` in response to errors during create.
+
+  Default implementation sets the status to `:unprocessable_entity` and renders
+  the error messages provided.
+  """
+  @callback handle_invalid_create(Plug.Conn.t, Ecto.Changeset.t) :: Plug.Conn.t
+
+  @doc """
+  Returns a `Plug.Conn` in response to successful create.
+
+  Default implementation sets the status to `:created` and renders the view.
+  """
+  @callback render_create(Plug.Conn.t, JaResource.record) :: Plug.Conn.t
+
   defmacro __using__(_) do
     quote do
       @behaviour JaResource.Create
       use JaResource.Repo
       use JaResource.Attributes
+      import Plug.Conn
 
       def handle_create(_conn, attributes) do
         __MODULE__.model.changeset(__MODULE__.model.__struct__, attributes)
       end
 
-      defoverridable [handle_create: 2]
+      def handle_invalid_create(conn, errors) do
+        conn
+        |> put_status(:unprocessable_entity)
+        |> Phoenix.Controller.render(:errors, data: errors)
+      end
+
+      def render_create(conn, model) do
+        conn
+        |> put_status(:created)
+        |> Phoenix.Controller.render(:show, data: model)
+      end
+
+      defoverridable [handle_create: 2, handle_invalid_create: 2, render_create: 2]
     end
   end
 
@@ -67,7 +95,7 @@ defmodule JaResource.Create do
     conn
     |> controller.handle_create(attributes)
     |> JaResource.Create.insert(controller)
-    |> JaResource.Create.respond(conn)
+    |> JaResource.Create.respond(conn, controller)
   end
 
   @doc false
@@ -82,20 +110,8 @@ defmodule JaResource.Create do
   def insert(other, _controller), do: other
 
   @doc false
-  def respond(%Plug.Conn{} = conn, _old_conn), do: conn
-  def respond({:error, errors}, conn), do: invalid(conn, errors)
-  def respond({:ok, model}, conn), do: created(conn, model)
-  def respond(model, conn), do: created(conn, model)
-
-  defp created(conn, model) do
-    conn
-    |> put_status(:created)
-    |> Phoenix.Controller.render(:show, data: model)
-  end
-
-  defp invalid(conn, errors) do
-    conn
-    |> put_status(:unprocessable_entity)
-    |> Phoenix.Controller.render(:errors, data: errors)
-  end
+  def respond(%Plug.Conn{} = conn, _old_conn, _), do: conn
+  def respond({:error, errors}, conn, controller), do: controller.handle_invalid_create(conn, errors)
+  def respond({:ok, model}, conn, controller), do: controller.render_create(conn, model)
+  def respond(model, conn, controller), do: controller.render_create(conn, model)
 end

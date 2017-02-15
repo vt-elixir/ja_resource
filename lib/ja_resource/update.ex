@@ -18,6 +18,8 @@ defmodule JaResource.Update do
     * JaResource.Record.record/2
     * JaResource.Records.records/1
     * handle_update/3
+    * handle_invalid_update/2
+    * render_update/2
     * JaResource.Attributes.permitted_attributes/3
 
   """
@@ -48,6 +50,21 @@ defmodule JaResource.Update do
   """
   @callback handle_update(Plug.Conn.t, JaResource.record, JaResource.attributes) :: Plug.Conn.t | JaResource.record | nil
 
+  @doc """
+  Returns a `Plug.Conn` in response to errors during update.
+
+  Default implementation sets the status to `:unprocessable_entity` and renders
+  the error messages provided.
+  """
+  @callback handle_invalid_update(Plug.Conn.t, Ecto.Changeset.t) :: Plug.Conn.t
+
+  @doc """
+  Returns a `Plug.Conn` in response to successful update.
+
+  Default implementation renders the view.
+  """
+  @callback render_update(Plug.Conn.t, JaResource.record) :: Plug.Conn.t
+
   defmacro __using__(_) do
     quote do
       use JaResource.Record
@@ -59,7 +76,18 @@ defmodule JaResource.Update do
         __MODULE__.model.changeset(model, attributes)
       end
 
-      defoverridable [handle_update: 3]
+      def handle_invalid_update(conn, errors) do
+        conn
+        |> put_status(:unprocessable_entity)
+        |> Phoenix.Controller.render(:errors, data: errors)
+      end
+
+      def render_update(conn, model) do
+        conn
+        |> Phoenix.Controller.render(:show, data: model)
+      end
+
+      defoverridable [handle_update: 3, handle_invalid_update: 2, render_update: 2]
     end
   end
 
@@ -74,7 +102,7 @@ defmodule JaResource.Update do
     conn
     |> controller.handle_update(model, attributes)
     |> JaResource.Update.update(controller)
-    |> JaResource.Update.respond(conn)
+    |> JaResource.Update.respond(conn, controller)
   end
 
   @doc false
@@ -89,20 +117,9 @@ defmodule JaResource.Update do
   def update(other, _controller), do: other
 
   @doc false
-  def respond(%Plug.Conn{} = conn, _oldconn), do: conn
-  def respond(nil, conn), do: send_resp(conn, :not_found, "")
-  def respond({:error, errors}, conn), do: invalid(conn, errors)
-  def respond({:ok, model}, conn), do: updated(conn, model)
-  def respond(model, conn), do: updated(conn, model)
-
-  defp updated(conn, model) do
-    conn
-    |> Phoenix.Controller.render(:show, data: model)
-  end
-
-  defp invalid(conn, errors) do
-    conn
-    |> put_status(:unprocessable_entity)
-    |> Phoenix.Controller.render(:errors, data: errors)
-  end
+  def respond(%Plug.Conn{} = conn, _oldconn, _), do: conn
+  def respond(nil, conn, _), do: send_resp(conn, :not_found, "")
+  def respond({:error, errors}, conn, controller), do: controller.handle_invalid_update(conn, errors)
+  def respond({:ok, model}, conn, controller), do: controller.render_update(conn, model)
+  def respond(model, conn, controller), do: controller.render_update(conn, model)
 end
