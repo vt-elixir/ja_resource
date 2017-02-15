@@ -1,6 +1,4 @@
 defmodule JaResource.Attributes do
-  use Behaviour
-
   @moduledoc """
   Provides the `permitted_attributes/3` callback used for filtering attributes.
 

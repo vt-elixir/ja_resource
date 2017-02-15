@@ -1,6 +1,4 @@
 defmodule JaResource.Record do
-  use Behaviour
-
   @moduledoc """
   This behaviour is used by the following JaResource actions:
 

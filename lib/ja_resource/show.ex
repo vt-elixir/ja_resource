@@ -1,5 +1,4 @@
 defmodule JaResource.Show do
-  use Behaviour
   import Plug.Conn
 
   @moduledoc """

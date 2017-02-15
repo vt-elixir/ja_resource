@@ -1,6 +1,4 @@
 defmodule JaResource.Repo do
-  use Behaviour
-
   @doc """
   Defines the module `use`-ing `Ecto.Repo` to be used by the controller.
 
