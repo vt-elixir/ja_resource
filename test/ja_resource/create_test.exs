@@ -27,6 +27,17 @@ defmodule JaResource.CreateTest do
       do: {:error, [title: "is invalid"]}
   end
 
+  defmodule CustomResponseController do
+    use Phoenix.Controller
+    use JaResource.Create
+    def repo, do: JaResourceTest.Repo
+    def model, do: JaResourceTest.Post
+    def handle_invalid_create(conn, errors),
+      do: put_status(conn, 401) |> Phoenix.Controller.render(:errors, data: errors)
+    def render_create(conn, model),
+      do: put_status(conn, :ok) |> Phoenix.Controller.render(:show, data: model)
+  end
+
   test "default implementation renders 201 if valid" do
     conn = prep_conn(:post, "/posts", ja_attrs(%{"title" => "valid"}))
     response = Create.call(DefaultController, conn)
@@ -55,6 +66,18 @@ defmodule JaResource.CreateTest do
     conn = prep_conn(:post, "/posts", ja_attrs(%{"title" => "invalid"}))
     response = Create.call(CustomController, conn)
     assert response.status == 422
+  end
+
+  test "custom implementation renders 200 if valid" do
+    conn = prep_conn(:post, "/posts", ja_attrs(%{"title" => "valid"}))
+    response = Create.call(CustomResponseController, conn)
+    assert response.status == 200
+  end
+
+  test "custom implementation renders 401 if invalid" do
+    conn = prep_conn(:post, "/posts", ja_attrs(%{"title" => "invalid"}))
+    response = Create.call(CustomResponseController, conn)
+    assert response.status == 401
   end
 
   def prep_conn(method, path, params \\ %{}) do
