@@ -340,3 +340,55 @@ end
 The record argument (`post` in the above example) is the record found by the
 `record/2` callback. If `record/2` can not find a record it will be nil.
 
+### Custom responses
+
+It is possible to override the default responses for create and update actions
+in both the success and invalid cases.
+
+#### Create
+
+Customizing the create response can be done with the `render_create/2` and
+`handle_invalid_create/2` functions. For example:
+
+```elixir
+defmodule MyApp.V1.PostController do
+  use MyApp.Web, :controller
+  use JaResource
+
+  def render_create(conn, model) do
+    conn
+    |> Plug.Conn.put_status(:ok)
+    |> Phoenix.Controller.render(:show, data: model)
+  end
+
+  def handle_invalid_create(conn, errors),
+    conn
+    |> Plug.Conn.put_status(401)
+    |> Phoenix.Controller.render(:errors, data: errors)
+  end
+end
+```
+
+### Update
+
+Customizing the update response can be done with the `render_update/2` and
+`handle_invalid_update/2` functions. For example:
+
+```elixir
+defmodule MyApp.V1.PostController do
+  use MyApp.Web, :controller
+  use JaResource
+
+  def render_update(conn, model) do
+    conn
+    |> Plug.Conn.put_status(:created)
+    |> Phoenix.Controller.render(:show, data: model)
+  end
+
+  def handle_invalid_update(conn, errors) do
+    conn
+    |> Plug.Conn.put_status(401)
+    |> Phoenix.Controller.render(:errors, data: errors)
+  end
+end
+```
