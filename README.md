@@ -1,6 +1,6 @@
 # JaResource
 
-[![Build Status](https://travis-ci.org/AgilionApps/ja_resource.svg?branch=master)](https://travis-ci.org/AgilionApps/ja_resource)
+[![Build Status](https://travis-ci.org/vt-elixir/ja_resource.svg?branch=master)](https://travis-ci.org/vt-elixir/ja_resource)
 [![Hex Version](https://img.shields.io/hexpm/v/ja_resource.svg)](https://hex.pm/packages/ja_resource)
 
 A behaviour to reduce boilerplate code in your JSON-API compliant Phoenix
@@ -22,7 +22,7 @@ only customize a few callbacks. It is a webmachine like approach to building
 APIs on top of Phoenix.
 
 JaResource is built to work in conjuction with sister library
-[JaSerializer](https://github.com/AgilionApps/ja_serializer). JaResource
+[JaSerializer](https://github.com/vt-elixir/ja_serializer). JaResource
 handles the controller side of things while JaSerializer is focused exclusively
 on view logic.
 
@@ -33,10 +33,6 @@ See [Usage](#usage) for more details on customizing and restricting endpoints.
 JaResource lets you focus on the data in your APIs, instead of worrying about
 response status, rendering validation errors, and inserting changesets. You get
 robust patterns and while reducing maintainance overhead.
-
-At Agilion we value moving quickly while developing quality applications. This
-library has come out of our experience building many APIs in a variety of
-fields.
 
 ## Installation
 
@@ -59,7 +55,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
         config :ja_resource,
           repo: MyApp.Repo
 
-  4. JaSerializer / JSON-API setup. JaResource is built to work with JaSerializer. Please refer to https://github.com/AgilionApps/ja_serializer#phoenix-usage to setup Plug and Phoenix for JaSerializer and JaResource.
+  4. JaSerializer / JSON-API setup. JaResource is built to work with JaSerializer. Please refer to https://github.com/vt-elixir/ja_serializer#phoenix-usage to setup Plug and Phoenix for JaSerializer and JaResource.
 
 
 ## Usage

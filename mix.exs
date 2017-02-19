@@ -3,11 +3,11 @@ defmodule JaResource.Mixfile do
 
   def project do
     [app: :ja_resource,
-     version: "0.2.0",
+     version: "0.3.0",
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     source_url: "https://github.com/AgilionApps/ja_resource",
+     source_url: "https://github.com/vt-elixir/ja_resource",
      package: package(),
      description: description(),
      deps: deps()]
@@ -35,7 +35,7 @@ defmodule JaResource.Mixfile do
       licenses: ["Apache 2.0"],
       maintainers: ["Alan Peabody"],
       links: %{
-        "GitHub" => "https://github.com/AgilionApps/ja_resource"
+        "GitHub" => "https://github.com/vt-elixir/ja_resource"
       },
     ]
   end
