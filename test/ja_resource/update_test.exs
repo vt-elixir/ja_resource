@@ -35,6 +35,17 @@ defmodule JaResource.UpdateTest do
       do: put_status(conn, :created) |> Phoenix.Controller.render(:show, data: model)
   end
 
+  defmodule MultiCustomController do
+    use Phoenix.Controller
+    use JaResource.Update
+    def repo, do: JaResourceTest.Repo
+    def handle_update(_c, _post, params) do
+      changeset = JaResourceTest.Post.changeset(JaResourceTest.Post, params)
+      Ecto.Multi.new
+      |> Ecto.Multi.update(:post, changeset)
+    end
+  end
+
   test "default implementation renders 404 if record not found" do
     conn = prep_conn(:put, "/posts/404", ja_attrs(404, %{"title" => "valid"}))
     response = Update.call(DefaultController, conn)
@@ -87,6 +98,20 @@ defmodule JaResource.UpdateTest do
     conn = prep_conn(:put, "/posts/#{post.id}", ja_attrs(post.id, %{"title" => "valid"}))
     response = Update.call(CustomResponseController, conn)
     assert response.status == 201
+  end
+
+  test "custom multi implementation renders 200 if valid" do
+    {:ok, post} = JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 200})
+    conn = prep_conn(:put, "/posts/#{post.id}", ja_attrs(post.id, %{"title" => "valid"}))
+    response = Update.call(MultiCustomController, conn)
+    assert response.status == 200
+  end
+
+  test "custom multi implementation renders 422 if invalid" do
+    {:ok, post} = JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 422})
+    conn = prep_conn(:put, "/posts/#{post.id}", ja_attrs(post.id, %{"title" => "invalid"}))
+    response = Update.call(MultiCustomController, conn)
+    assert response.status == 422
   end
 
   def prep_conn(method, path, params \\ %{}) do

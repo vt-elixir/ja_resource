@@ -120,6 +120,7 @@ defmodule JaResource.Update do
   def respond(%Plug.Conn{} = conn, _oldconn, _), do: conn
   def respond(nil, conn, _), do: send_resp(conn, :not_found, "")
   def respond({:error, errors}, conn, controller), do: controller.handle_invalid_update(conn, errors)
+  def respond({:error, _name, errors, _changes}, conn, controller), do: controller.handle_invalid_update(conn, errors)
   def respond({:ok, model}, conn, controller), do: controller.render_update(conn, model)
   def respond(model, conn, controller), do: controller.render_update(conn, model)
 end

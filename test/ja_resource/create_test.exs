@@ -38,6 +38,17 @@ defmodule JaResource.CreateTest do
       do: put_status(conn, :ok) |> Phoenix.Controller.render(:show, data: model)
   end
 
+  defmodule MultiCustomController do
+    use Phoenix.Controller
+    use JaResource.Create
+    def repo, do: JaResourceTest.Repo
+    def handle_create(_, params) do
+      changeset = JaResourceTest.Post.changeset(JaResourceTest.Post, params)
+      Ecto.Multi.new
+      |> Ecto.Multi.insert(:post, changeset)
+    end
+  end
+
   test "default implementation renders 201 if valid" do
     conn = prep_conn(:post, "/posts", ja_attrs(%{"title" => "valid"}))
     response = Create.call(DefaultController, conn)
@@ -65,6 +76,18 @@ defmodule JaResource.CreateTest do
   test "custom implementation handles {:error, errors}" do
     conn = prep_conn(:post, "/posts", ja_attrs(%{"title" => "invalid"}))
     response = Create.call(CustomController, conn)
+    assert response.status == 422
+  end
+
+  test "custom multi implementation handles valid data" do
+    conn = prep_conn(:post, "/posts", ja_attrs(%{"title" => "valid"}))
+    response = Create.call(MultiCustomController, conn)
+    assert response.status == 201
+  end
+
+  test "custom multi implementation handles invalid data" do
+    conn = prep_conn(:post, "/posts", ja_attrs(%{"title" => "invalid"}))
+    response = Create.call(MultiCustomController, conn)
     assert response.status == 422
   end
 
