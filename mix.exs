@@ -4,7 +4,7 @@ defmodule JaResource.Mixfile do
   def project do
     [app: :ja_resource,
      version: "0.2.0",
-     elixir: "~> 1.2",
+     elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      source_url: "https://github.com/AgilionApps/ja_resource",
@@ -15,18 +15,18 @@ defmodule JaResource.Mixfile do
 
   # Configuration for the OTP application
   def application do
-    [applications: [:logger, :phoenix]]
+    [extra_applications: []]
   end
 
   defp deps do
     [
-      {:ecto, "~> 2.0"},
-      {:plug, "~> 1.2"},
-      {:phoenix, "~> 1.1"},
-      {:ja_serializer, "~> 0.9"},
+      {:ecto, "~> 2.1.4"},
+      {:plug, "~> 1.3.2"},
+      {:phoenix, "1.3.0-rc.0"},
+      {:ja_serializer, "~> 0.12.0"},
 
-      {:earmark, "~> 1.0.1", only: :dev},
-      {:ex_doc,  "~> 0.13", only: :dev},
+      {:earmark, "~> 1.1", only: :dev},
+      {:ex_doc,  "~> 0.14.5", only: :dev},
     ]
   end
 
