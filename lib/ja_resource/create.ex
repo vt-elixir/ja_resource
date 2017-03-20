@@ -112,6 +112,7 @@ defmodule JaResource.Create do
   @doc false
   def respond(%Plug.Conn{} = conn, _old_conn, _), do: conn
   def respond({:error, errors}, conn, controller), do: controller.handle_invalid_create(conn, errors)
+  def respond({:error, _name, errors, _changes}, conn, controller), do: controller.handle_invalid_create(conn, errors)
   def respond({:ok, model}, conn, controller), do: controller.render_create(conn, model)
   def respond(model, conn, controller), do: controller.render_create(conn, model)
 end

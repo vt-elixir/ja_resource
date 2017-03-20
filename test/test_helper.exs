@@ -88,6 +88,20 @@ defmodule JaResourceTest.Repo do
       MapSet.delete(state, old)
     end
   end
+
+  def transaction(%Ecto.Multi{operations: [{schema, {:changeset, %Ecto.Changeset{valid?: false} = changeset, _}}]}) do
+    {:error, schema, changeset, %{}}
+  end
+
+  def transaction(%Ecto.Multi{operations: [{schema, {:changeset, %Ecto.Changeset{valid?: true, action: :insert} = changeset, _}}]}) do
+    {:ok, inserted} = insert(changeset.data)
+    {:ok, %{schema => inserted}}
+  end
+
+  def transaction(%Ecto.Multi{operations: [{schema, {:changeset, %Ecto.Changeset{valid?: true, action: :update} = changeset, _}}]}) do
+    {:ok, updated} = update(changeset)
+    {:ok, %{schema => updated}}
+  end
 end
 
 # We don't actually need to use Ecto.Schema, just implement it's api.
