@@ -237,7 +237,7 @@ defmodule MyApp.ArticleController do
   end
 
   def sort(_conn, query, "published", direction) do
-    order_by(query, [{direction, :inserted_at}])
+    order_by(query, [{^direction, :inserted_at}])
   end
 end
 ```
