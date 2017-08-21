@@ -169,9 +169,10 @@ defmodule MyApp.V1.MyPostController do
 end
 ```
 
-`record/2` receives the results of `records/1` and the id param and returns a
-single record for use in show, update, and delete. This is less common to
-customize but may be useful if using non-id fields in the url:
+`record/2` receives the `conn` and the id param and returns a
+single record for use in show, update, and delete.
+The default implementation calls `records/1` with the `conn`, then narrows the query to find only the record with the expected id.
+This is less common to customize, but may be useful if using non-id fields in the url:
 
 ```elixir
 defmodule MyApp.V1.PostController do
