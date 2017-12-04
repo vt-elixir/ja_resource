@@ -10,6 +10,13 @@ defmodule JaResource.DeleteTest do
     def model, do: JaResourceTest.Post
   end
 
+  defmodule FailingOnDeleteController do
+    use Phoenix.Controller
+    use JaResource.Delete
+    def repo, do: JaResourceTest.Repo
+    def model, do: JaResourceTest.FailingOnDeletePost
+  end
+
   defmodule CustomController do
     use Phoenix.Controller
     use JaResource.Delete
@@ -34,6 +41,13 @@ defmodule JaResource.DeleteTest do
     conn = prep_conn(:delete, "/posts/#{post.id}", %{"id" => post.id})
     response = Delete.call(DefaultController, conn)
     assert response.status == 204
+  end
+
+  test "failing on delete returns 422 if model fails on changeset validation" do
+    {:ok, post} = JaResourceTest.Repo.insert(%JaResourceTest.FailingOnDeletePost{id: 422})
+    conn = prep_conn(:delete, "/posts/#{post.id}", %{"id" => post.id})
+    response = Delete.call(FailingOnDeleteController, conn)
+    assert response.status == 422
   end
 
   test "custom implementation retuns 401 if not admin" do

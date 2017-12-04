@@ -41,10 +41,10 @@ defmodule JaResourceTest.Repo do
     end
   end
 
-  def get(query, id) do
+  def get(_query, id) do
     Agent.get __MODULE__, fn(state) ->
       Enum.find state, fn(record) ->
-        record.__struct__ == query && record.id == id
+        record.id == id
       end
     end
   end
@@ -78,6 +78,10 @@ defmodule JaResourceTest.Repo do
       |> MapSet.delete(old)
       |> MapSet.put(Map.merge(old, new))
     end
+  end
+
+  def delete(%Ecto.Changeset{valid?: false} = changeset) do
+    {:error, changeset}
   end
 
   def delete(to_delete) do
@@ -118,6 +122,19 @@ defmodule JaResourceTest.Post do
       "invalid" -> %Ecto.Changeset{data: model, valid?: false, errors: [title: "is invalid"]}
       _         -> %Ecto.Changeset{data: model, valid?: true}
     end
+  end
+end
+
+defmodule JaResourceTest.FailingOnDeletePost do
+  defstruct [id: 0, title: "title", body: "body", slug: "slug"]
+
+  def changeset(_model, params) do
+    model = %__MODULE__{
+      title: params["title"],
+      body:  params["body"],
+      slug:  params["slug"]
+    }
+    %Ecto.Changeset{data: model, valid?: false, errors: [title: "something went wrong"]}
   end
 end
 
