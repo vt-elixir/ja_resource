@@ -15,8 +15,10 @@ defmodule JaResource.Repo do
   @callback repo() :: module
   defmacro __using__(_opts) do
     quote do
-      @behaviour JaResource.Repo
-      unquote(default_repo())
+      unless JaResource.Repo in @behaviour do
+        @behaviour JaResource.Repo
+        unquote(default_repo())
+      end
     end
   end
 
