@@ -34,12 +34,14 @@ defmodule JaResource.Records do
 
   defmacro __using__(_) do
     quote do
-      use JaResource.Model
-      @behaviour JaResource.Records
+      unless JaResource.Records in @behaviour do
+        use JaResource.Model
+        @behaviour JaResource.Records
 
-      def records(_conn), do: model()
+        def records(_conn), do: model()
 
-      defoverridable [records: 1]
+        defoverridable [records: 1]
+      end
     end
   end
 end

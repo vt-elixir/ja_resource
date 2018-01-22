@@ -49,18 +49,20 @@ defmodule JaResource.Serializable do
 
   defmacro __using__(_) do
     quote do
-      @behaviour JaResource.Serializable
+      unless JaResource.Serializable in @behaviour do
+        @behaviour JaResource.Serializable
 
-      def serialization_opts(_conn, %{"fields" => f, "include" => i}, _model_or_models),
-        do: [include: i, fields: f]
-      def serialization_opts(_conn, %{"include" => i}, _model_or_models),
-        do: [include: i]
-      def serialization_opts(_conn, %{"fields" => f}, _model_or_models),
-        do: [fields: f]
-      def serialization_opts(_conn, _params, _model_or_models),
-        do: []
+        def serialization_opts(_conn, %{"fields" => f, "include" => i}, _model_or_models),
+          do: [include: i, fields: f]
+        def serialization_opts(_conn, %{"include" => i}, _model_or_models),
+          do: [include: i]
+        def serialization_opts(_conn, %{"fields" => f}, _model_or_models),
+          do: [fields: f]
+        def serialization_opts(_conn, _params, _model_or_models),
+          do: []
 
-      defoverridable [serialization_opts: 3]
+        defoverridable [serialization_opts: 3]
+      end
     end
   end
 end

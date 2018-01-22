@@ -28,16 +28,18 @@ defmodule JaResource.Record do
 
   defmacro __using__(_) do
     quote do
-      use JaResource.Records
-      @behaviour JaResource.Record
+      unless JaResource.Record in @behaviour do
+        use JaResource.Records
+        @behaviour JaResource.Record
 
-      def record(conn, id) do
-        conn
-        |> records
-        |> repo().get(id)
+        def record(conn, id) do
+          conn
+          |> records
+          |> repo().get(id)
+        end
+
+        defoverridable [record: 2]
       end
-
-      defoverridable [record: 2]
     end
   end
 end
