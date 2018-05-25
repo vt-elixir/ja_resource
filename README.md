@@ -43,21 +43,24 @@ fields.
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed by:
 
   1. Adding ja_resource to your list of dependencies in `mix.exs`:
-
+        ```elixir
         def deps do
           [{:ja_resource, "~> 0.1.0"}]
         end
+        ```
 
   2. Ensuring ja_resource is started before your application:
-
+        ```elixir
         def application do
           [applications: [:ja_resource]]
         end
+        ```
 
   3. ja_resource can be configured to execute queries on a given repo.  While not required, we encourage doing so to preserve clarity:
-
+        ```elixir
         config :ja_resource,
           repo: MyApp.Repo
+        ```  
 
   4. JaSerializer / JSON-API setup. JaResource is built to work with JaSerializer. Please refer to https://github.com/vt-elixir/ja_serializer#phoenix-usage to setup Plug and Phoenix for JaSerializer and JaResource.
 
