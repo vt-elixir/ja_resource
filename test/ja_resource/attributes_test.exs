@@ -99,4 +99,45 @@ defmodule JaResource.AttributesTest do
     actual = JaResource.Attributes.from_params(params)
     assert actual == merged
   end
+
+  test "formatting only relationships from json-api params, with embedded attributes" do
+    params = %{
+      "data" => %{
+        "type" => "post",
+        "relationships" => %{
+          "categories" => %{
+            "data" => [
+              %{
+                "attributes" => %{
+                  "name" => "Category Name"
+                },
+                "type" => "category", "id" => "1"
+              },
+              %{
+                "attributes" => %{
+                  "name" => "Other Category Name"
+                },
+                "type" => "category", "id" => "2"
+              }
+            ]
+          }
+        }
+      }
+    }
+    merged = %{
+      "type" => "post",
+      "categories" => [
+        %{
+          "name" => "Category Name",
+          "id" => "1"
+        },
+        %{
+          "name" => "Other Category Name",
+          "id" => "2"
+        }
+      ]
+    }
+    actual = JaResource.Attributes.from_params(params)
+    assert actual == merged
+  end
 end
