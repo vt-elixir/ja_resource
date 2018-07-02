@@ -39,11 +39,13 @@ defmodule JaResource.Attributes do
 
   defmacro __using__(_) do
     quote do
-      @behaviour JaResource.Attributes
+      unless JaResource.Attributes in @behaviour do
+        @behaviour JaResource.Attributes
 
-      def permitted_attributes(_conn, attrs, _), do: attrs
+        def permitted_attributes(_conn, attrs, _), do: attrs
 
-      defoverridable [permitted_attributes: 3]
+        defoverridable [permitted_attributes: 3]
+      end
     end
   end
 

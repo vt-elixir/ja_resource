@@ -46,7 +46,11 @@ defmodule JaResource.Delete do
       use JaResource.Record
       @behaviour JaResource.Delete
       def handle_delete(conn, nil), do: nil
-      def handle_delete(conn, model), do: __MODULE__.repo().delete(model)
+      def handle_delete(conn, model) do
+        model
+        |> __MODULE__.model.changeset(%{})
+        |> __MODULE__.repo().delete
+      end
 
       defoverridable [handle_delete: 2]
     end
@@ -68,6 +72,7 @@ defmodule JaResource.Delete do
   def respond(%Plug.Conn{} = conn, _old_conn), do: conn
   def respond({:ok, _model}, conn), do: deleted(conn)
   def respond({:errors, errors}, conn), do: invalid(conn, errors)
+  def respond({:error, errors}, conn), do: invalid(conn, errors)
   def respond(_model, conn), do: deleted(conn)
 
   defp not_found(conn) do
