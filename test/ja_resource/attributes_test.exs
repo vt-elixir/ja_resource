@@ -36,14 +36,17 @@ defmodule JaResource.AttributesTest do
   test "formatting attributes from json-api params with relationships" do
     params = %{
       "data" => %{
-        "id"   => "1",
+        "id" => "1",
         "type" => "post",
         "attributes" => %{
           "title" => "a post"
         },
         "relationships" => %{
           "category" => %{
-            "data" => %{"type" => "category", "id" => "1"}
+            "data" => %{
+              "type" => "category",
+              "id" => "1"
+            }
           },
           "tag" => %{
             "data" => [
@@ -87,7 +90,10 @@ defmodule JaResource.AttributesTest do
         "type" => "post",
         "relationships" => %{
           "category" => %{
-            "data" => %{"type" => "category", "id" => "1"}
+            "data" => %{
+              "type" => "category",
+              "id" => "1"
+            }
           }
         }
       }
@@ -111,13 +117,15 @@ defmodule JaResource.AttributesTest do
                 "attributes" => %{
                   "name" => "Category Name"
                 },
-                "type" => "category", "id" => "1"
+                "type" => "category",
+                "id" => "1"
               },
               %{
                 "attributes" => %{
                   "name" => "Other Category Name"
                 },
-                "type" => "category", "id" => "2"
+                "type" => "category",
+                "id" => "2"
               }
             ]
           }
@@ -134,6 +142,69 @@ defmodule JaResource.AttributesTest do
         %{
           "name" => "Other Category Name",
           "id" => "2"
+        }
+      ]
+    }
+    actual = JaResource.Attributes.from_params(params)
+    assert actual == merged
+  end
+
+  test "formatting nested relationships from json-api params, with embedded attributes" do
+    params = %{
+      "data" => %{
+        "attributes" => %{
+          "name" => "Test"
+        },
+        "id" => "6af961ee-ec6d-47af-8448-74c281dd6c6b",
+        "relationships" => %{
+          "first_item" => %{
+            "data" => %{
+              "id" => "a1d67f8e-74a3-41ac-956d-619caa0421f9",
+              "type" => "items"
+            }
+          },
+          "paths" => %{
+            "data" => [
+              %{
+                "attributes" => %{
+                  "formula" => nil,
+                  "input" => 3
+                },
+                "id" => "7ca35dbd-8054-4e17-a914-ac125216fdd2",
+                "relationships" => %{
+                  "from_item" => %{
+                    "data" => %{
+                      "id" => "a1d67f8e-74a3-41ac-956d-619caa0421f9",
+                      "type" => "items"
+                    }
+                  },
+                  "to_item" => %{
+                    "data" => %{
+                      "id" => "8b02344b-5399-4e95-a51e-8a7186a59459",
+                      "type" => "items"
+                    }
+                  }
+                },
+                "type" => "flow-paths"
+              }
+            ]
+          }
+        },
+        "type" => "flows"
+      },
+      "id" => "6af961ee-ec6d-47af-8448-74c281dd6c6b"
+    }
+    merged = %{
+      "type" => "flows",
+      "first_item_id" => "a1d67f8e-74a3-41ac-956d-619caa0421f9",
+      "name" => "Test",
+      "paths" => [
+        %{
+          "formula" => nil,
+          "from_item_id" => "a1d67f8e-74a3-41ac-956d-619caa0421f9",
+          "id" => "7ca35dbd-8054-4e17-a914-ac125216fdd2",
+          "input" => 3,
+          "to_item_id" => "8b02344b-5399-4e95-a51e-8a7186a59459"
         }
       ]
     }

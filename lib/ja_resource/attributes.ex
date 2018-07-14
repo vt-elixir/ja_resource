@@ -71,7 +71,10 @@ defmodule JaResource.Attributes do
         Map.put(rel, "#{name}_id", id)
       ({name, %{"data" => ids}}, rel) when is_list(ids) ->
         case Enum.all?(ids, fn(id) -> Map.has_key?(id, "attributes") end) do
-          true -> Map.put(rel, name, Enum.map(ids, fn(id) -> Map.merge(%{"id" => id["id"]}, id["attributes"]) end))
+          true -> Map.put(rel, name, Enum.map(ids, fn
+            (%{"id" => id, "relationships" => relationships, "attributes" => attributes}) ->  Map.merge(Map.merge(%{"id" =>id}, attributes), parse_relationships(%{"relationships" =>relationships}))
+            (%{"id" => id, "attributes" => attributes}) ->  Map.merge(%{"id" => id}, attributes)
+          end))
           _ -> Map.put(rel, "#{name}_ids", Enum.map(ids, &(&1["id"])))
         end
     end
