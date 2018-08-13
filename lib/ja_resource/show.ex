@@ -15,6 +15,7 @@ defmodule JaResource.Show do
   To customize the behaviour of the show action the following callbacks can be implemented:
 
     * handle_show/2
+    * render_index/3
     * JaResource.Record.record/2
     * JaResource.Record.records/1
 
@@ -38,7 +39,14 @@ defmodule JaResource.Show do
   In most cases JaResource.Record.record/2 and JaResource.Records.records/1 are
   the better customization hooks.
   """
-  @callback handle_show(Plug.Conn.t, JaResource.id) :: Plug.Conn.t | JaResource.record
+  @callback handle_show(Plug.Conn.t(), JaResource.id()) :: Plug.Conn.t() | JaResource.record()
+
+  @doc """
+  Returns a `Plug.Conn` in response to successful show.
+
+  Default implementation renders the view.
+  """
+  @callback render_show(Plug.Conn.t(), JaResource.record()) :: Plug.Conn.t()
 
   defmacro __using__(_) do
     quote do
@@ -48,7 +56,12 @@ defmodule JaResource.Show do
 
       def handle_show(conn, id), do: record(conn, id)
 
-      defoverridable [handle_show: 2]
+      def render_show(conn, model, opts) do
+        conn
+        |> Phoenix.Controller.render(:show, data: model, opts: opts)
+      end
+
+      defoverridable handle_show: 2, render_show: 3
     end
   end
 
@@ -63,16 +76,17 @@ defmodule JaResource.Show do
 
   @doc false
   def respond(%Plug.Conn{} = conn, _old_conn, _controller), do: conn
+
   def respond(nil, conn, _controller) do
     conn
     |> put_status(:not_found)
-    |> Phoenix.Controller.render(:errors, data: %{
-        status: 404,
-        title: "Not Found",
-        detail: "The resource was not found"})
+    |> Phoenix.Controller.render(:errors,
+      data: %{status: 404, title: "Not Found", detail: "The resource was not found"}
+    )
   end
+
   def respond(model, conn, controller) do
     opts = controller.serialization_opts(conn, conn.query_params, model)
-    Phoenix.Controller.render(conn, :show, data: model, opts: opts)
+    controller.render_show(conn, model, opts)
   end
 end
