@@ -15,7 +15,7 @@ defmodule JaResource.Show do
   To customize the behaviour of the show action the following callbacks can be implemented:
 
     * handle_show/2
-    * render_index/3
+    * render_index/2
     * JaResource.Record.record/2
     * JaResource.Record.records/1
 
@@ -56,12 +56,12 @@ defmodule JaResource.Show do
 
       def handle_show(conn, id), do: record(conn, id)
 
-      def render_show(conn, model, opts) do
+      def render_show(conn, model) do
         conn
-        |> Phoenix.Controller.render(:show, data: model, opts: opts)
+        |> Phoenix.Controller.render(:show, data: model)
       end
 
-      defoverridable handle_show: 2, render_show: 3
+      defoverridable handle_show: 2, render_show: 2
     end
   end
 
@@ -85,8 +85,5 @@ defmodule JaResource.Show do
     )
   end
 
-  def respond(model, conn, controller) do
-    opts = controller.serialization_opts(conn, conn.query_params, model)
-    controller.render_show(conn, model, opts)
-  end
+  def respond(model, conn, controller), do: controller.render_show(conn, model)
 end
