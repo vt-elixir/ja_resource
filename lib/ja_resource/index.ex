@@ -16,6 +16,7 @@ defmodule JaResource.Index do
   To customize the behaviour of the index action the following callbacks can be implemented:
 
     * handle_index/2
+    * render_index/3
     * filter/4
     * sort/4
     * JaResource.Records.records/1
@@ -46,7 +47,7 @@ defmodule JaResource.Index do
   In most cases JaResource.Records.records/1, filter/4, and sort/4 are the
   better customization hooks.
   """
-  @callback handle_index(Plug.Conn.t, map) :: Plug.Conn.t | JaResource.records
+  @callback handle_index(Plug.Conn.t(), map) :: Plug.Conn.t() | JaResource.records()
 
   @doc """
   Callback executed for each `filter` param.
@@ -75,7 +76,8 @@ defmodule JaResource.Index do
 
   Anything not explicitly matched by your callbacks will be ignored.
   """
-  @callback filter(Plug.Conn.t, JaResource.records, String.t, String.t) :: JaResource.records
+  @callback filter(Plug.Conn.t(), JaResource.records(), String.t(), String.t()) ::
+              JaResource.records()
 
   @doc """
   Callback executed for each value in the sort param.
@@ -100,7 +102,8 @@ defmodule JaResource.Index do
 
   Anything not explicitly matched by your callbacks will be ignored.
   """
-  @callback sort(Plug.Conn.t, JaResource.records, String.t, :asc | :dsc) :: JaResource.records
+  @callback sort(Plug.Conn.t(), JaResource.records(), String.t(), :asc | :dsc) ::
+              JaResource.records()
 
   @doc """
   Callback executed to query repo.
@@ -113,7 +116,14 @@ defmodule JaResource.Index do
       end
 
   """
-  @callback handle_index_query(Plug.Conn.t, Ecto.Query.t | module) :: any
+  @callback handle_index_query(Plug.Conn.t(), Ecto.Query.t() | module) :: any
+
+  @doc """
+  Returns a `Plug.Conn` in response to successful update.
+
+  Default implementation renders the view.
+  """
+  @callback render_index(Plug.Conn.t(), JaResource.records(), list) :: Plug.Conn.t()
 
   @doc """
   Execute the index action on a given module implementing Index behaviour and conn.
@@ -136,29 +146,35 @@ defmodule JaResource.Index do
       @before_compile JaResource.Index
 
       def handle_index_query(_conn, query), do: repo().all(query)
-      defoverridable [handle_index_query: 2]
+
+      def render_index(conn, models, opts) do
+        conn
+        |> Phoenix.Controller.render(:index, data: models, opts: opts)
+      end
 
       def handle_index(conn, params), do: records(conn)
-      defoverridable [handle_index: 2]
+
+      defoverridable handle_index: 2, render_index: 3, handle_index_query: 2
     end
   end
 
   @doc false
   defmacro __before_compile__(_) do
     quote do
-      def filter(_conn, results,  _key, _val), do: results
-      def sort(_conn, results,  _key, _dir), do: results
+      def filter(_conn, results, _key, _val), do: results
+      def sort(_conn, results, _key, _dir), do: results
     end
   end
 
   @doc false
   def filter(results, conn = %{params: %{"filter" => filters}}, resource) do
     filters
-    |> Map.keys
-    |> Enum.reduce(results, fn(k, acc) ->
+    |> Map.keys()
+    |> Enum.reduce(results, fn k, acc ->
       resource.filter(conn, acc, k, filters[k])
     end)
   end
+
   def filter(results, _conn, _controller), do: results
 
   @sort_regex ~r/(-?)(\S*)/
@@ -166,13 +182,14 @@ defmodule JaResource.Index do
   def sort(results, conn = %{params: %{"sort" => fields}}, controller) do
     fields
     |> String.split(",")
-    |> Enum.reduce(results, fn(field, acc) ->
+    |> Enum.reduce(results, fn field, acc ->
       case Regex.run(@sort_regex, field) do
-        [_, "", field]  -> controller.sort(conn, acc, field, :asc)
+        [_, "", field] -> controller.sort(conn, acc, field, :asc)
         [_, "-", field] -> controller.sort(conn, acc, field, :desc)
       end
     end)
   end
+
   def sort(results, _conn, _controller), do: results
 
   @doc false
@@ -183,9 +200,10 @@ defmodule JaResource.Index do
   @doc false
   def respond(%Plug.Conn{} = conn, _oldconn, _controller), do: conn
   def respond({:error, errors}, conn, _controller), do: error(conn, errors)
+
   def respond(models, conn, controller) do
     opts = controller.serialization_opts(conn, conn.query_params, models)
-    Phoenix.Controller.render(conn, :index, data: models, opts: opts)
+    controller.render_index(conn, models, opts)
   end
 
   defp error(conn, errors) do

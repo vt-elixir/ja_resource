@@ -243,6 +243,58 @@ defmodule MyApp.ArticleController do
 end
 ```
 
+### Paginate
+
+The handle_index_query/2 can be used to apply query params and render_index/3 to serialize meta tag.
+
+For example, given the following request:
+
+`GET /v1/articles?page[number]=1&page[size]=10`
+
+You would implement the following callbacks:
+
+```elixir
+defmodule MyApp.ArticleController do
+  use MyApp.Web, :controller
+  use JaSerializer
+
+  def handle_index_query(%{query_params: params}, query) do
+    number = String.to_integer(params["page"]["number"])
+    size = String.to_integer(params["page"]["size"])
+    total = from(t in subquery(query), select: count("*")) |> repo().one()
+
+    records =
+      query
+      |> limit(^(number + 1))
+      |> offset(^(number * size))
+      |> repo().all()
+
+    %{
+      page: %{
+        number: number,
+        size: size
+      },
+      total: total,
+      records: records
+    }
+  end
+
+  def render_index(conn, paginated, opts) do
+    conn
+    |> Phoenix.Controller.render(
+      :index,
+      data: paginated.records,
+      opts: opts ++ [
+        meta: %{
+          page: paginated.page,
+          total: paginated.total
+        }
+      ]
+    )
+  end
+end
+```
+
 ### Creating and Updating
 
 Like index and show, customizing creating and updating resources can be done

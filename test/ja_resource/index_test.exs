@@ -17,16 +17,45 @@ defmodule JaResource.IndexTest do
     def handle_index(conn, _id), do: send_resp(conn, 401, "")
   end
 
+  defmodule PaginatedController do
+    use Phoenix.Controller
+    use JaResource.Index
+    def repo, do: JaResourceTest.Repo
+
+    def handle_index_query(%{query_params: params}, query) do
+      %{
+        page: %{
+          number: params["page"]["number"],
+          size: params["page"]["size"]
+        },
+        total: 0,
+        records: repo().all(query)
+      }
+    end
+
+    def render_index(conn, paginated, opts) do
+      conn
+      |> Phoenix.Controller.render(
+        :index,
+        data: paginated.records,
+        meta: %{
+          page: paginated.page,
+          total: paginated.total
+        },
+        opts: opts
+      )
+    end
+  end
+
   defmodule QueryErrorController do
     use Phoenix.Controller
     use JaResource.Index
     def repo, do: JaResourceTest.Repo
-    def handle_index_query(_conn, _params),
-      do: {:error, [details: "An error"]}
+    def handle_index_query(_conn, _params), do: {:error, [details: "An error"]}
   end
 
   setup do
-    JaResourceTest.Repo.reset
+    JaResourceTest.Repo.reset()
     JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 1})
     JaResourceTest.Repo.insert(%JaResourceTest.Post{id: 2})
     :ok
@@ -48,6 +77,18 @@ defmodule JaResource.IndexTest do
     assert response.status == 401
   end
 
+  test "paginated implementation serialize meta" do
+    conn = prep_conn(:get, "/posts?page[number]=1&page[size]=10")
+    response = Index.call(PaginatedController, conn)
+
+    assert response.assigns == %{
+             data: [],
+             layout: false,
+             meta: %{page: %{number: "1", size: "10"}, total: 0},
+             opts: []
+           }
+  end
+
   test "query errors are handled correctly" do
     conn = prep_conn(:get, "/posts")
     response = Index.call(QueryErrorController, conn)
@@ -63,8 +104,9 @@ defmodule JaResource.IndexTest do
 
   def prep_conn(method, path, params \\ %{}) do
     params = Map.merge(params, %{"_format" => "json"})
+
     conn(method, path, params)
-      |> fetch_query_params
-      |> Phoenix.Controller.put_view(JaResourceTest.PostView)
+    |> fetch_query_params
+    |> Phoenix.Controller.put_view(JaResourceTest.PostView)
   end
 end
