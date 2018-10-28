@@ -224,7 +224,7 @@ defaults to the results of your `records/1` callback).
 
 For example, given the following request:
 
-`GET /v1/articles?filter[category]=dogs&sort=-published`
+`GET /v1/articles?filter[category]=dogs&filter[favourite-snack]=cheese&sort=-published`
 
 You would implement the following callbacks:
 
@@ -236,12 +236,18 @@ defmodule MyApp.ArticleController do
   def filter(_conn, query, "category", category) do
     where(query, category: ^category)
   end
+  
+  def filter(_conn, query, "favourite_snack", snack) do
+    where(query, favourite_snack: ^favourite_snack)
+  en
 
   def sort(_conn, query, "published", direction) do
     order_by(query, [{^direction, :inserted_at}])
   end
 end
 ```
+
+Note that in the case of `filter[favourite-snack]` JaResource has already helpfully converted the filter param's name from dasherized to underscore (or from [whatever you configured](https://github.com/vt-elixir/ja_serializer#key-format-for-attribute-relationship-and-query-param) your API to use).
 
 ### Paginate
 
