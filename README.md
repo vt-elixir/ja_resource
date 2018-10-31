@@ -227,7 +227,7 @@ defaults to the results of your `records/1` callback).
 
 For example, given the following request:
 
-`GET /v1/articles?filter[category]=dogs&sort=-published`
+`GET /v1/articles?filter[category]=dogs&filter[favourite-snack]=cheese&sort=-published`
 
 You would implement the following callbacks:
 
@@ -239,9 +239,67 @@ defmodule MyApp.ArticleController do
   def filter(_conn, query, "category", category) do
     where(query, category: ^category)
   end
+  
+  def filter(_conn, query, "favourite_snack", snack) do
+    where(query, favourite_snack: ^favourite_snack)
+  en
 
   def sort(_conn, query, "published", direction) do
     order_by(query, [{^direction, :inserted_at}])
+  end
+end
+```
+
+Note that in the case of `filter[favourite-snack]` JaResource has already helpfully converted the filter param's name from dasherized to underscore (or from [whatever you configured](https://github.com/vt-elixir/ja_serializer#key-format-for-attribute-relationship-and-query-param) your API to use).
+
+### Paginate
+
+The handle_index_query/2 can be used to apply query params and render_index/3 to serialize meta tag.
+
+For example, given the following request:
+
+`GET /v1/articles?page[number]=1&page[size]=10`
+
+You would implement the following callbacks:
+
+```elixir
+defmodule MyApp.ArticleController do
+  use MyApp.Web, :controller
+  use JaSerializer
+
+  def handle_index_query(%{query_params: params}, query) do
+    number = String.to_integer(params["page"]["number"])
+    size = String.to_integer(params["page"]["size"])
+    total = from(t in subquery(query), select: count("*")) |> repo().one()
+
+    records =
+      query
+      |> limit(^(number + 1))
+      |> offset(^(number * size))
+      |> repo().all()
+
+    %{
+      page: %{
+        number: number,
+        size: size
+      },
+      total: total,
+      records: records
+    }
+  end
+
+  def render_index(conn, paginated, opts) do
+    conn
+    |> Phoenix.Controller.render(
+      :index,
+      data: paginated.records,
+      opts: opts ++ [
+        meta: %{
+          page: paginated.page,
+          total: paginated.total
+        }
+      ]
+    )
   end
 end
 ```
